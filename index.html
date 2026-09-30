@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vocabulary Trainer — Unit 1</title>
+<style>
+  :root{
+    --bg:#eef3f8;
+    --panel:#ffffff;
+    --text:#172033;
+    --muted:#6b7280;
+    --line:#dce4ee;
+    --blue:#1f6feb;
+    --blue2:#1557b0;
+    --green:#179c5a;
+    --red:#d93b47;
+    --orange:#d97706;
+    --shadow:0 18px 45px rgba(31, 50, 81, .12);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background:
+      radial-gradient(circle at 10% 10%, rgba(31,111,235,.10), transparent 28rem),
+      radial-gradient(circle at 90% 90%, rgba(23,156,90,.08), transparent 30rem),
+      var(--bg);
+    color:var(--text);
+  }
+  button,input,select{font:inherit}
+  button{cursor:pointer}
+  .app{max-width:1180px;margin:0 auto;padding:28px 30px 40px}
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:22px;
+  }
+  .brand{display:flex;align-items:center;gap:14px}
+  .logo{
+    width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#1f6feb,#50a2ff);
+    color:white;display:grid;place-items:center;font-size:24px;font-weight:900;box-shadow:0 10px 24px rgba(31,111,235,.25)
+  }
+  h1{font-size:24px;margin:0;letter-spacing:-.02em}
+  .subtitle{color:var(--muted);margin-top:2px;font-size:14px}
+  .pill{background:#fff;border:1px solid var(--line);padding:9px 13px;border-radius:999px;color:#475569;font-size:13px}
+
+  .panel{
+    background:rgba(255,255,255,.96);
+    border:1px solid rgba(220,228,238,.95);
+    border-radius:24px;
+    box-shadow:var(--shadow);
+  }
+
+  /* setup */
+  #setupView{padding:28px}
+  .setup-grid{display:grid;grid-template-columns:1.3fr .85fr;gap:28px}
+  .section-title{font-size:17px;font-weight:800;margin:0 0 13px}
+  .small{font-size:13px;color:var(--muted)}
+  .category-list{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .cat{
+    border:1px solid var(--line);border-radius:14px;padding:12px 13px;display:flex;align-items:center;gap:10px;
+    background:#fbfdff;transition:.16s ease;
+  }
+  .cat:hover{border-color:#9fc3f5;transform:translateY(-1px)}
+  .cat input{accent-color:var(--blue);width:18px;height:18px}
+  .cat-name{font-weight:700;font-size:14px}
+  .cat-count{margin-left:auto;color:var(--muted);font-size:12px}
+  .setup-side{
+    border-left:1px solid var(--line);padding-left:26px;display:flex;flex-direction:column;gap:18px
+  }
+  .field label{display:block;font-size:13px;font-weight:750;margin-bottom:7px;color:#334155}
+  select{
+    width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:#fff;color:var(--text);outline:none;
+  }
+  select:focus{border-color:#7fb0ef;box-shadow:0 0 0 3px rgba(31,111,235,.10)}
+  .checkrow{display:flex;align-items:center;gap:10px;color:#334155;font-size:14px}
+  .checkrow input{accent-color:var(--blue);width:17px;height:17px}
+  .primary{
+    border:0;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;font-weight:800;
+    padding:13px 18px;border-radius:13px;box-shadow:0 10px 22px rgba(31,111,235,.22)
+  }
+  .primary:hover{filter:brightness(1.04)}
+  .ghost{
+    border:1px solid var(--line);background:#fff;color:#334155;font-weight:750;padding:11px 15px;border-radius:12px
+  }
+  .ghost:hover{background:#f7faff}
+  .danger-soft{border-color:#ffd0d4;color:#b4232e;background:#fff7f8}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+  /* quiz */
+  #quizView{display:none}
+  .quiz-shell{display:grid;grid-template-columns:220px 1fr;min-height:590px}
+  .sidebar{padding:24px;border-right:1px solid var(--line);background:linear-gradient(180deg,#f8fbff,#fff);border-radius:24px 0 0 24px}
+  .stat{margin-bottom:22px}
+  .stat-label{font-size:12px;color:var(--muted);margin-bottom:5px}
+  .stat-value{font-size:28px;font-weight:900;letter-spacing:-.03em}
+  .progressbar{height:9px;background:#e9eef5;border-radius:999px;overflow:hidden;margin-top:7px}
+  .progressbar>div{height:100%;background:linear-gradient(90deg,#1f6feb,#5aa7ff);width:0%;transition:.25s ease}
+  .kbd{display:inline-block;border:1px solid #cdd6e2;border-bottom-width:2px;border-radius:6px;padding:1px 6px;background:white;font-size:11px;color:#5b6472}
+  .quiz-main{padding:34px 42px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;background:#edf5ff;color:#1b5fb4;border:1px solid #d7e9ff;
+    padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800;width:max-content;max-width:100%;
+  }
+  .direction{color:var(--muted);font-size:14px;margin-top:20px}
+  .prompt{
+    font-size:clamp(30px,4vw,52px);line-height:1.08;font-weight:900;letter-spacing:-.045em;margin:12px 0 30px;
+    overflow-wrap:anywhere;
+  }
+  .answer-wrap{display:flex;gap:10px}
+  #answerInput{
+    flex:1;min-width:0;border:2px solid #ced8e5;border-radius:16px;padding:15px 17px;font-size:20px;outline:none;
+    transition:.14s ease;background:#fff;
+  }
+  #answerInput:focus{border-color:#72a8ed;box-shadow:0 0 0 4px rgba(31,111,235,.10)}
+  #answerInput.correct{border-color:#55bb83;background:#f4fff8}
+  #answerInput.wrong{border-color:#ef7d86;background:#fff7f8}
+  #checkBtn{min-width:128px}
+  .feedback{
+    min-height:82px;margin-top:17px;border-radius:14px;padding:14px 16px;display:none;border:1px solid transparent;
+  }
+  .feedback.show{display:block}
+  .feedback.good{background:#f1fbf6;border-color:#bfe8d1;color:#126b3e}
+  .feedback.bad{background:#fff5f6;border-color:#f5c3c7;color:#9c2430}
+  .feedback strong{display:block;margin-bottom:4px}
+  .answer-display{font-weight:800}
+  .mini-actions{display:flex;justify-content:space-between;gap:12px;margin-top:22px;align-items:center}
+  .hidden{display:none!important}
+
+  /* results */
+  #resultsView{display:none;padding:34px}
+  .result-wrap{max-width:760px;margin:0 auto;text-align:center}
+  .score-ring{
+    width:150px;height:150px;border-radius:50%;margin:10px auto 22px;
+    display:grid;place-items:center;background:conic-gradient(var(--green) 0deg, #e8eef5 0deg);
+    position:relative;
+  }
+  .score-ring:after{content:"";position:absolute;inset:13px;background:white;border-radius:50%}
+  .score-inner{position:relative;z-index:1}
+  .score-num{font-size:39px;font-weight:950;line-height:1}
+  .score-label{font-size:12px;color:var(--muted);margin-top:5px}
+  .result-title{font-size:30px;font-weight:900;margin:0 0 8px}
+  .result-sub{color:var(--muted);margin:0 auto 24px}
+  .result-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:24px}
+  .mistake-box{
+    text-align:left;margin-top:26px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fbfdff;
+    max-height:250px;overflow:auto;
+  }
+  .mistake-row{display:grid;grid-template-columns:1fr 1fr;gap:15px;padding:11px 14px;border-bottom:1px solid var(--line);font-size:13px}
+  .mistake-row:last-child{border-bottom:0}
+  .mistake-row b{color:#8d2630}
+  footer{text-align:center;color:#8a94a5;font-size:12px;margin-top:18px}
+
+  @media(max-width:850px){
+    .app{padding:16px}
+    .setup-grid{grid-template-columns:1fr}
+    .setup-side{border-left:0;border-top:1px solid var(--line);padding:20px 0 0}
+    .quiz-shell{grid-template-columns:1fr}
+    .sidebar{display:none}
+    .quiz-main{padding:28px 24px;min-height:560px}
+    .category-list{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">V</div>
+      <div>
+        <h1>Vocabulary Trainer</h1>
+        <div class="subtitle">Unit 1 — The Land of the Long White Cloud</div>
+      </div>
+    </div>
+    <div class="pill"><b id="totalWordsTop">0</b> woorden & uitdrukkingen</div>
+  </div>
+
+  <section id="setupView" class="panel">
+    <div class="setup-grid">
+      <div>
+        <div class="section-title">Wat wil je oefenen?</div>
+        <div class="small" style="margin-bottom:13px">Selecteer één of meerdere onderdelen uit je cursus.</div>
+        <div id="categoryList" class="category-list"></div>
+        <div class="row" style="margin-top:14px">
+          <button class="ghost" id="selectAllBtn">Alles selecteren</button>
+          <button class="ghost" id="selectNoneBtn">Niets selecteren</button>
+        </div>
+      </div>
+      <div class="setup-side">
+        <div class="field">
+          <label for="directionSelect">Vraagrichting</label>
+          <select id="directionSelect">
+            <option value="en-nl">Engels → Nederlands</option>
+            <option value="nl-en">Nederlands → Engels</option>
+            <option value="mixed">Door elkaar</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="amountSelect">Aantal vragen</label>
+          <select id="amountSelect">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="50">50</option>
+            <option value="all" selected>Volledige reeks</option>
+          </select>
+        </div>
+        <label class="checkrow"><input id="shuffleCheck" type="checkbox" checked> Woorden door elkaar</label>
+        <label class="checkrow"><input id="retryImmediatelyCheck" type="checkbox"> Fout woord meteen later nog eens laten terugkomen</label>
+        <button class="primary" id="startBtn">Start oefenen</button>
+        <div class="small">Typ je antwoord en druk op <span class="kbd">Enter</span>. De website verbetert automatisch.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="quizView" class="panel">
+    <div class="quiz-shell">
+      <aside class="sidebar">
+        <div class="stat">
+          <div class="stat-label">VOORTGANG</div>
+          <div class="stat-value"><span id="progressNow">1</span>/<span id="progressTotal">0</span></div>
+          <div class="progressbar"><div id="progressFill"></div></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">JUIST</div>
+          <div class="stat-value" style="color:var(--green)" id="correctCount">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">FOUT</div>
+          <div class="stat-value" style="color:var(--red)" id="wrongCount">0</div>
+        </div>
+        <div class="small" style="line-height:1.7;margin-top:30px">
+          <span class="kbd">Enter</span> nakijken / volgende<br>
+          <span class="kbd">Esc</span> terug naar menu
+        </div>
+      </aside>
+
+      <main class="quiz-main">
+        <div id="questionBadge" class="badge"></div>
+        <div id="directionText" class="direction"></div>
+        <div id="promptText" class="prompt"></div>
+
+        <div class="answer-wrap">
+          <input id="answerInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Typ je antwoord..." />
+          <button id="checkBtn" class="primary">Nakijken</button>
+        </div>
+
+        <div id="feedback" class="feedback">
+          <strong id="feedbackTitle"></strong>
+          <div id="feedbackText"></div>
+        </div>
+
+        <div class="mini-actions">
+          <button id="skipBtn" class="ghost danger-soft">Ik weet het niet</button>
+          <div class="small">Hoofdletters, leestekens en accenten worden soepel gecontroleerd.</div>
+        </div>
+      </main>
+    </div>
+  </section>
+
+  <section id="resultsView" class="panel">
+    <div class="result-wrap">
+      <div class="score-ring" id="scoreRing">
+        <div class="score-inner">
+          <div class="score-num" id="scorePercent">0%</div>
+          <div class="score-label">score</div>
+        </div>
+      </div>
+      <h2 class="result-title" id="resultTitle">Reeks klaar</h2>
+      <p class="result-sub" id="resultSub"></p>
+
+      <div id="mistakeSection" class="hidden">
+        <div class="section-title" style="text-align:left">Je fouten</div>
+        <div id="mistakeBox" class="mistake-box"></div>
+      </div>
+
+      <div class="result-actions">
+        <button id="retryMistakesBtn" class="primary">Maak mijn fouten opnieuw</button>
+        <button id="retryAllBtn" class="ghost">Volledige reeks opnieuw</button>
+        <button id="backSetupBtn" class="ghost">Terug naar instellingen</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Werkt volledig offline — alles staat in dit HTML-bestand.</footer>
+</div>
+
+<script>
+const vocabulary = [
+  // Page 20 — only the bold vocabulary itself
+  {c:"Landschap — enthousiasme", en:"awe-inspiring", nl:["ontzagwekkend"]},
+  {c:"Landschap — enthousiasme", en:"awesome", nl:["geweldig","fantastisch"]},
+  {c:"Landschap — enthousiasme", en:"breathtaking", nl:["adembenemend"]},
+  {c:"Landschap — enthousiasme", en:"dazzling", nl:["oogverblindend"]},
+  {c:"Landschap — enthousiasme", en:"dramatic", nl:["indrukwekkend","spectaculair"]},
+  {c:"Landschap — enthousiasme", en:"eye-catching", nl:["opvallend"]},
+  {c:"Landschap — enthousiasme", en:"epic", nl:["legendarisch","episch"]},
+  {c:"Landschap — enthousiasme", en:"exciting", nl:["opwindend"]},
+  {c:"Landschap — enthousiasme", en:"exhilarating", nl:["opwindend","spannend"]},
+  {c:"Landschap — enthousiasme", en:"captivating", nl:["boeiend","fascinerend"]},
+  {c:"Landschap — enthousiasme", en:"gorgeous", nl:["schitterend","grandioos"]},
+  {c:"Landschap — enthousiasme", en:"gripping", nl:["pakkend","boeiend"]},
+  {c:"Landschap — enthousiasme", en:"incredible", nl:["ongelooflijk"]},
+  {c:"Landschap — enthousiasme", en:"magical", nl:["magisch"]},
+  {c:"Landschap — enthousiasme", en:"magnificent", nl:["groots","indrukwekkend"]},
+  {c:"Landschap — enthousiasme", en:"mind-blowing", nl:["waanzinnig","verbluffend"]},
+  {c:"Landschap — enthousiasme", en:"one-of-a-kind", nl:["uniek"]},
+  {c:"Landschap — enthousiasme", en:"phenomenal", nl:["fenomenaal","buitengewoon"]},
+  {c:"Landschap — enthousiasme", en:"picturesque", nl:["schilderachtig"]},
+  {c:"Landschap — enthousiasme", en:"remarkable", nl:["opmerkelijk"]},
+  {c:"Landschap — enthousiasme", en:"scenic", nl:["schilderachtig"]},
+  {c:"Landschap — enthousiasme", en:"sensational", nl:["sensationeel"]},
+  {c:"Landschap — enthousiasme", en:"smashing", nl:["geweldig","fenomenaal"]},
+  {c:"Landschap — enthousiasme", en:"spectacular", nl:["spectaculair","indrukwekkend"]},
+  {c:"Landschap — enthousiasme", en:"splendid", nl:["schitterend","prachtig"]},
+  {c:"Landschap — enthousiasme", en:"stunning", nl:["verbluffend","beeldschoon"]},
+  {c:"Landschap — enthousiasme", en:"thrilling", nl:["opwindend","aangrijpend"]},
+  {c:"Landschap — enthousiasme", en:"unspoilt", nl:["ongerept"]},
+  {c:"Landschap — enthousiasme", en:"untouched", nl:["ongerept","onaangetast"]},
+  {c:"Landschap — enthousiasme", en:"incredibly varied", nl:["ongelooflijk divers","zeer afwisselend"]},
+  {c:"Landschap — enthousiasme", en:"wondrous", nl:["wonderbaarlijk"]},
+
+  // Page 21 — visitor enthusiasm
+  {c:"Enthousiasme van een bezoeker", en:"amazed", nl:["versteld staan","verbaasd zijn","verbluft zijn"]},
+  {c:"Enthousiasme van een bezoeker", en:"an absolute blast", nl:["het geweldig naar je zin hebben","het geweldig naar zijn zin hebben"]},
+  {c:"Enthousiasme van een bezoeker", en:"keen", nl:["enthousiast zijn over iets","dol zijn op"]},
+  {c:"Enthousiasme van een bezoeker", en:"eager", nl:["staan popelen","heel enthousiast zijn over"]},
+  {c:"Enthousiasme van een bezoeker", en:"embrace", nl:["in je armen sluiten","in je hart sluiten","iets in je armen sluiten","iets in je hart sluiten"]},
+  {c:"Enthousiasme van een bezoeker", en:"never fails to amaze", nl:["het blijft verbazen"]},
+  {c:"Enthousiasme van een bezoeker", en:"impressed", nl:["onder de indruk zijn van","onder de indruk zijn"]},
+  {c:"Enthousiasme van een bezoeker", en:"left speechless", nl:["verstomd staan","sprakeloos zijn"]},
+  {c:"Enthousiasme van een bezoeker", en:"over the moon", nl:["in de wolken zijn","zeer gelukkig zijn"]},
+  {c:"Enthousiasme van een bezoeker", en:"open-mouthed", nl:["sprakeloos","sprakeloos van verbazing"]},
+  {c:"Enthousiasme van een bezoeker", en:"stoked", nl:["opgetogen zijn","enthousiast zijn"]},
+  {c:"Enthousiasme van een bezoeker", en:"takes my breath away", nl:["het is adembenemend","adembenemend"]},
+  {c:"Enthousiasme van een bezoeker", en:"thrilled", nl:["dolblij zijn","dolblij zijn om","dolblij zijn over"]},
+  {c:"Enthousiasme van een bezoeker", en:"can't wait to", nl:["niet kunnen wachten om iets te zien of doen","niet kunnen wachten om"]},
+
+  // Page 21 — nature/geography/geology: only bolded key words
+  {c:"Natuur, geografie & geologie", en:"clear", nl:["helder"]},
+  {c:"Natuur, geografie & geologie", en:"geothermal", nl:["geothermisch"]},
+  {c:"Natuur, geografie & geologie", en:"lush", nl:["welig"]},
+  {c:"Natuur, geografie & geologie", en:"offshore", nl:["voor de kust liggend"]},
+  {c:"Natuur, geografie & geologie", en:"remote", nl:["afgelegen"]},
+  {c:"Natuur, geografie & geologie", en:"rolling", nl:["golvend"]},
+  {c:"Natuur, geografie & geologie", en:"rugged", nl:["ruw","ruig"]},
+  {c:"Natuur, geografie & geologie", en:"scenery", nl:["landschap"]},
+  {c:"Natuur, geografie & geologie", en:"sloping", nl:["hellend"]},
+  {c:"Natuur, geografie & geologie", en:"steep", nl:["steil"]},
+  {c:"Natuur, geografie & geologie", en:"subterranean", nl:["onderaards"]},
+  {c:"Natuur, geografie & geologie", en:"thermal", nl:["thermisch"]},
+  {c:"Natuur, geografie & geologie", en:"vast", nl:["enorm groot"]},
+  {c:"Natuur, geografie & geologie", en:"verdant", nl:["groen","met gras bedekt"]},
+  {c:"Natuur, geografie & geologie", en:"volcanic", nl:["vulkanisch"]},
+
+  // Page 22 — Good to know
+  {c:"Good to know", en:"endemic", nl:["endemisch","een soort die alleen in een bepaald gebied voorkomt en nergens anders"]},
+  {c:"Good to know", en:"nocturnal", nl:["nachtelijk"]},
+  {c:"Good to know", en:"indigenous", nl:["inheems"]},
+  {c:"Good to know", en:"Kiwi", nl:["een inwoner van nieuw-zeeland","inwoner van nieuw-zeeland"]},
+  {c:"Good to know", en:"kiwi", nl:["een kiwi","kiwi","kiwivrucht","vogel die in nieuw-zeeland voorkomt"]},
+  {c:"Good to know", en:"pest", nl:["een plaag"]},
+  {c:"Good to know", en:"pest control", nl:["bestrijding van plagen","bestrijding van ongedierte"]},
+  {c:"Good to know", en:"tectonic plate", nl:["een tektonische plaat","tektonische plaat"]},
+
+  // Page 23 — Academic Word List
+  {c:"Academic word list", en:"adequate", nl:["voldoende","toereikend"]},
+  {c:"Academic word list", en:"adjacent", nl:["aangrenzend","naastgelegen"]},
+  {c:"Academic word list", en:"arbitrary", nl:["willekeurig"]},
+  {c:"Academic word list", en:"considerable", nl:["aanzienlijk"]},
+  {c:"Academic word list", en:"crucial", nl:["cruciaal","doorslaggevend"]},
+  {c:"Academic word list", en:"enormous", nl:["enorm","reusachtig"]},
+  {c:"Academic word list", en:"external", nl:["extern","uitwendig"]},
+  {c:"Academic word list", en:"fundamental", nl:["fundamenteel","essentieel"]},
+  {c:"Academic word list", en:"hierarchical", nl:["hiërarchisch","hierarchisch"]},
+  {c:"Academic word list", en:"identical", nl:["identiek","hetzelfde"]},
+  {c:"Academic word list", en:"incompatible", nl:["niet compatibel","onverenigbaar"]},
+  {c:"Academic word list", en:"inherent", nl:["inherent","eigen aan"]},
+  {c:"Academic word list", en:"intermediate", nl:["tussenliggend","intermediair","gemiddeld niveau"]},
+  {c:"Academic word list", en:"intrinsic", nl:["intrinsiek","wezenlijk"]},
+  {c:"Academic word list", en:"isolated", nl:["geïsoleerd","afgelegen"]},
+  {c:"Academic word list", en:"major", nl:["belangrijk","groot","voornaam"]},
+  {c:"Academic word list", en:"marginal", nl:["marginaal","gering"]},
+  {c:"Academic word list", en:"overall", nl:["algemeen","over het geheel"]},
+  {c:"Academic word list", en:"passive", nl:["passief"]},
+  {c:"Academic word list", en:"physical", nl:["fysiek","lichamelijk"]},
+  {c:"Academic word list", en:"precise", nl:["precies","nauwkeurig"]},
+  {c:"Academic word list", en:"primary", nl:["primair","voornaamste","belangrijkste"]},
+  {c:"Academic word list", en:"qualitative", nl:["kwalitatief"]},
+  {c:"Academic word list", en:"radical", nl:["radicaal","ingrijpend"]},
+  {c:"Academic word list", en:"relaxed", nl:["ontspannen"]},
+  {c:"Academic word list", en:"significant", nl:["aanzienlijk","belangrijk","significant"]},
+  {c:"Academic word list", en:"similar", nl:["gelijkaardig","vergelijkbaar"]},
+  {c:"Academic word list", en:"so-called", nl:["zogenaamd"]},
+  {c:"Academic word list", en:"solely", nl:["uitsluitend","alleen"]},
+  {c:"Academic word list", en:"straightforward", nl:["eenvoudig","ongecompliceerd","rechttoe rechtaan"]},
+  {c:"Academic word list", en:"sufficient", nl:["voldoende","toereikend"]},
+  {c:"Academic word list", en:"underlying", nl:["onderliggend"]},
+  {c:"Academic word list", en:"visual", nl:["visueel"]},
+  {c:"Academic word list", en:"voluntary", nl:["vrijwillig"]},
+  {c:"Academic word list", en:"widespread", nl:["wijdverspreid"]},
+  {c:"Academic word list", en:"conference", nl:["conferentie"]},
+  {c:"Academic word list", en:"convention", nl:["conventie","congres"]},
+  {c:"Academic word list", en:"panel", nl:["panel","deskundigencommissie"]}
+];
+
+const categories = [...new Set(vocabulary.map(v=>v.c))];
+
+const $ = id => document.getElementById(id);
+$("totalWordsTop").textContent = vocabulary.length;
+
+function renderCategories(){
+  const box = $("categoryList");
+  box.innerHTML = "";
+  categories.forEach((cat,i)=>{
+    const count = vocabulary.filter(v=>v.c===cat).length;
+    const label = document.createElement("label");
+    label.className = "cat";
+    label.innerHTML = `
+      <input type="checkbox" class="cat-check" value="${escapeHtml(cat)}" checked>
+      <span class="cat-name">${escapeHtml(cat)}</span>
+      <span class="cat-count">${count}</span>`;
+    box.appendChild(label);
+  });
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+renderCategories();
+
+$("selectAllBtn").onclick=()=>document.querySelectorAll(".cat-check").forEach(x=>x.checked=true);
+$("selectNoneBtn").onclick=()=>document.querySelectorAll(".cat-check").forEach(x=>x.checked=false);
+
+let queue = [];
+let originalQueue = [];
+let index = 0;
+let correct = 0;
+let wrong = 0;
+let answered = false;
+let mistakes = [];
+let current = null;
+
+function normalize(s){
+  return String(s)
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[’‘`]/g,"'")
+    .replace(/[()[\]{}.,!?;:"]/g," ")
+    .replace(/\s*\/\s*/g," ")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function variantsEnglish(s){
+  const base = normalize(s);
+  const out = new Set([base]);
+  out.add(base.replace(/^a /,"").replace(/^an /,"").replace(/^the /,""));
+  if(base.includes("(nz fiord)")) out.add(base.replace(" (nz fiord)",""));
+  if(base.includes("(by at)")) out.add(base.replace(" (by at)",""));
+  if(base.includes("(on)")) out.add(base.replace(" (on)",""));
+  if(base.includes("(to)")) out.add(base.replace(" (to)",""));
+  if(base.includes("(by)")) out.add(base.replace(" (by)",""));
+  if(base.includes("(about with)")) out.add(base.replace(" (about with)",""));
+  if(base.includes("(about)")) out.add(base.replace(" (about)",""));
+  if(base.includes("(to about)")) out.add(base.replace(" (to about)",""));
+  return [...out].filter(Boolean);
+}
+
+function makeQuestion(item, direction){
+  const dir = direction==="mixed" ? (Math.random()<.5 ? "en-nl":"nl-en") : direction;
+  if(dir==="en-nl"){
+    return {
+      item, dir,
+      prompt:item.en,
+      answers:item.nl,
+      display:item.nl.join(" / ")
+    };
+  } else {
+    return {
+      item, dir,
+      prompt:item.nl[0],
+      answers:variantsEnglish(item.en),
+      display:item.en
+    };
+  }
+}
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function startQuiz(customQuestions=null){
+  if(customQuestions){
+    queue = customQuestions.map(q=>({...q}));
+  } else {
+    const selected=[...document.querySelectorAll(".cat-check:checked")].map(x=>x.value);
+    if(!selected.length){ alert("Selecteer minstens één onderdeel."); return; }
+    let pool=vocabulary.filter(v=>selected.includes(v.c));
+    if($("shuffleCheck").checked) pool=shuffle([...pool]);
+
+    const n = $("amountSelect").value==="all" ? pool.length : Math.min(parseInt($("amountSelect").value),pool.length);
+    pool=pool.slice(0,n);
+    queue=pool.map(item=>makeQuestion(item,$("directionSelect").value));
+  }
+  originalQueue=queue.map(q=>({...q}));
+  index=0;correct=0;wrong=0;mistakes=[];answered=false;
+  $("setupView").style.display="none";
+  $("resultsView").style.display="none";
+  $("quizView").style.display="block";
+  $("progressTotal").textContent=queue.length;
+  showQuestion();
+}
+
+function showQuestion(){
+  if(index>=queue.length){ finishQuiz(); return; }
+  current=queue[index];
+  answered=false;
+  $("questionBadge").textContent=current.item.c;
+  $("directionText").textContent=current.dir==="en-nl" ? "Vertaal naar het Nederlands" : "Vertaal naar het Engels";
+  $("promptText").textContent=current.prompt;
+  $("answerInput").value="";
+  $("answerInput").classList.remove("correct","wrong");
+  $("answerInput").readOnly=false;
+  $("checkBtn").textContent="Nakijken";
+  $("feedback").className="feedback";
+  $("feedbackTitle").textContent="";
+  $("feedbackText").textContent="";
+  $("progressNow").textContent=index+1;
+  $("correctCount").textContent=correct;
+  $("wrongCount").textContent=wrong;
+  $("progressFill").style.width=((index/queue.length)*100)+"%";
+  setTimeout(()=>$("answerInput").focus(),30);
+}
+
+function isCorrectAnswer(raw){
+  const answer=normalize(raw);
+  if(!answer) return false;
+  const accepted=current.answers.map(normalize);
+  if(accepted.includes(answer)) return true;
+
+  // For Dutch answers, allow articles in front of noun translations.
+  const stripped=answer.replace(/^(een|de|het) /,"");
+  if(accepted.some(a=>a.replace(/^(een|de|het) /,"")===stripped)) return true;
+  return false;
+}
+
+function addMistake(q, userAnswer){
+  if(!mistakes.some(m=>m.q.item===q.item && m.q.dir===q.dir)){
+    mistakes.push({q:{...q}, userAnswer});
+  }
+}
+
+function checkAnswer(forceWrong=false){
+  if(answered){ nextQuestion(); return; }
+
+  const raw=$("answerInput").value;
+  const ok=!forceWrong && isCorrectAnswer(raw);
+  answered=true;
+  $("answerInput").readOnly=true;
+
+  if(ok){
+    correct++;
+    $("answerInput").classList.add("correct");
+    $("feedback").className="feedback show good";
+    $("feedbackTitle").textContent="Juist!";
+    $("feedbackText").textContent="Goed gedaan.";
+  }else{
+    wrong++;
+    $("answerInput").classList.add("wrong");
+    addMistake(current,raw);
+    $("feedback").className="feedback show bad";
+    $("feedbackTitle").textContent=forceWrong ? "Geen probleem — dit was het antwoord:" : "Niet juist. Dit is het correcte antwoord:";
+    $("feedbackText").innerHTML=`<span class="answer-display">${escapeHtml(current.display)}</span>`;
+
+    if($("retryImmediatelyCheck").checked && !queue[index]._retry){
+      const retry={...current,_retry:true};
+      const insertAt=Math.min(queue.length, index+3+Math.floor(Math.random()*3));
+      queue.splice(insertAt,0,retry);
+      $("progressTotal").textContent=queue.length;
+    }
+  }
+
+  $("correctCount").textContent=correct;
+  $("wrongCount").textContent=wrong;
+  $("checkBtn").textContent="Volgende";
+}
+
+function nextQuestion(){
+  index++;
+  showQuestion();
+}
+
+function finishQuiz(){
+  $("quizView").style.display="none";
+  $("resultsView").style.display="block";
+  const total=correct+wrong;
+  const pct=total ? Math.round(correct/total*100) : 0;
+  $("scorePercent").textContent=pct+"%";
+  $("scoreRing").style.background=`conic-gradient(var(--green) ${pct*3.6}deg, #e8eef5 0deg)`;
+  $("resultTitle").textContent = pct===100 ? "Perfecte reeks!" : pct>=80 ? "Sterke ronde!" : "Reeks klaar";
+  $("resultSub").textContent=`${correct} juist · ${wrong} fout · ${total} beantwoord`;
+
+  const section=$("mistakeSection"), box=$("mistakeBox");
+  box.innerHTML="";
+  if(mistakes.length){
+    section.classList.remove("hidden");
+    mistakes.forEach(m=>{
+      const row=document.createElement("div");
+      row.className="mistake-row";
+      row.innerHTML=`<div>${escapeHtml(m.q.prompt)}</div><div><b>${escapeHtml(m.q.display)}</b></div>`;
+      box.appendChild(row);
+    });
+    $("retryMistakesBtn").disabled=false;
+    $("retryMistakesBtn").style.opacity="1";
+  }else{
+    section.classList.add("hidden");
+    $("retryMistakesBtn").disabled=true;
+    $("retryMistakesBtn").style.opacity=".45";
+  }
+}
+
+$("startBtn").onclick=()=>startQuiz();
+$("checkBtn").onclick=()=>checkAnswer();
+$("skipBtn").onclick=()=>{ if(!answered) checkAnswer(true); else nextQuestion(); };
+
+$("answerInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter"){
+    e.preventDefault();
+    if(answered) nextQuestion(); else checkAnswer();
+  }
+});
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape" && $("quizView").style.display==="block"){
+    if(confirm("Stoppen met deze reeks en terug naar de instellingen?")){
+      $("quizView").style.display="none";
+      $("setupView").style.display="block";
+    }
+  }
+});
+
+$("retryMistakesBtn").onclick=()=>{
+  if(!mistakes.length) return;
+  const qs=mistakes.map(m=>({...m.q,_retry:false}));
+  if($("shuffleCheck").checked) shuffle(qs);
+  startQuiz(qs);
+};
+$("retryAllBtn").onclick=()=>{
+  const qs=originalQueue.map(q=>({...q,_retry:false}));
+  if($("shuffleCheck").checked) shuffle(qs);
+  startQuiz(qs);
+};
+$("backSetupBtn").onclick=()=>{
+  $("resultsView").style.display="none";
+  $("setupView").style.display="block";
+};
+
+</script>
+</body>
+</html>
