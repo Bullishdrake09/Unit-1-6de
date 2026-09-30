@@ -321,19 +321,19 @@ const vocabulary = [
   {c:"Landschap — enthousiasme", en:"wondrous", nl:["wonderbaarlijk"]},
 
   // Page 21 — visitor enthusiasm
-  {c:"Enthousiasme van een bezoeker", en:"amazed", nl:["versteld staan","verbaasd zijn","verbluft zijn"]},
-  {c:"Enthousiasme van een bezoeker", en:"an absolute blast", nl:["het geweldig naar je zin hebben","het geweldig naar zijn zin hebben"]},
-  {c:"Enthousiasme van een bezoeker", en:"keen", nl:["enthousiast zijn over iets","dol zijn op"]},
-  {c:"Enthousiasme van een bezoeker", en:"eager", nl:["staan popelen","heel enthousiast zijn over"]},
-  {c:"Enthousiasme van een bezoeker", en:"embrace", nl:["in je armen sluiten","in je hart sluiten","iets in je armen sluiten","iets in je hart sluiten"]},
-  {c:"Enthousiasme van een bezoeker", en:"never fails to amaze", nl:["het blijft verbazen"]},
-  {c:"Enthousiasme van een bezoeker", en:"impressed", nl:["onder de indruk zijn van","onder de indruk zijn"]},
-  {c:"Enthousiasme van een bezoeker", en:"left speechless", nl:["verstomd staan","sprakeloos zijn"]},
-  {c:"Enthousiasme van een bezoeker", en:"over the moon", nl:["in de wolken zijn","zeer gelukkig zijn"]},
+  {c:"Enthousiasme van een bezoeker", en:"to be amazed (by/at)", nl:["versteld staan","verbaasd zijn","verbluft zijn"]},
+  {c:"Enthousiasme van een bezoeker", en:"to have an absolute blast", nl:["het geweldig naar je zin hebben","het geweldig naar zijn zin hebben"]},
+  {c:"Enthousiasme van een bezoeker", en:"to be keen (on)", nl:["enthousiast zijn over iets","dol zijn op"]},
+  {c:"Enthousiasme van een bezoeker", en:"to be eager (to)", nl:["staan popelen","heel enthousiast zijn over"]},
+  {c:"Enthousiasme van een bezoeker", en:"to embrace", nl:["in je armen sluiten","in je hart sluiten","iets in je armen sluiten","iets in je hart sluiten"]},
+  {c:"Enthousiasme van een bezoeker", en:"it never fails to amaze", nl:["het blijft verbazen"]},
+  {c:"Enthousiasme van een bezoeker", en:"to be impressed (by)", nl:["onder de indruk zijn van","onder de indruk zijn"]},
+  {c:"Enthousiasme van een bezoeker", en:"to be left speechless", nl:["verstomd staan","sprakeloos zijn"]},
+  {c:"Enthousiasme van een bezoeker", en:"to be over the moon (about/with)", nl:["in de wolken zijn","zeer gelukkig zijn"]},
   {c:"Enthousiasme van een bezoeker", en:"open-mouthed", nl:["sprakeloos","sprakeloos van verbazing"]},
-  {c:"Enthousiasme van een bezoeker", en:"stoked", nl:["opgetogen zijn","enthousiast zijn"]},
-  {c:"Enthousiasme van een bezoeker", en:"takes my breath away", nl:["het is adembenemend","adembenemend"]},
-  {c:"Enthousiasme van een bezoeker", en:"thrilled", nl:["dolblij zijn","dolblij zijn om","dolblij zijn over"]},
+  {c:"Enthousiasme van een bezoeker", en:"to be stoked (about)", nl:["opgetogen zijn","enthousiast zijn"]},
+  {c:"Enthousiasme van een bezoeker", en:"it takes my breath away", nl:["het is adembenemend","adembenemend"]},
+  {c:"Enthousiasme van een bezoeker", en:"to be thrilled (to/about)", nl:["dolblij zijn","dolblij zijn om","dolblij zijn over"]},
   {c:"Enthousiasme van een bezoeker", en:"can't wait to", nl:["niet kunnen wachten om iets te zien of doen","niet kunnen wachten om"]},
 
   // Page 21 — nature/geography/geology: only bolded key words
@@ -452,18 +452,34 @@ function normalize(s){
 }
 
 function variantsEnglish(s){
-  const base = normalize(s);
-  const out = new Set([base]);
-  out.add(base.replace(/^a /,"").replace(/^an /,"").replace(/^the /,""));
-  if(base.includes("(nz fiord)")) out.add(base.replace(" (nz fiord)",""));
-  if(base.includes("(by at)")) out.add(base.replace(" (by at)",""));
-  if(base.includes("(on)")) out.add(base.replace(" (on)",""));
-  if(base.includes("(to)")) out.add(base.replace(" (to)",""));
-  if(base.includes("(by)")) out.add(base.replace(" (by)",""));
-  if(base.includes("(about with)")) out.add(base.replace(" (about with)",""));
-  if(base.includes("(about)")) out.add(base.replace(" (about)",""));
-  if(base.includes("(to about)")) out.add(base.replace(" (to about)",""));
-  return [...out].filter(Boolean);
+  const out = new Set();
+
+  function add(v){
+    v = normalize(v);
+    if(!v) return;
+    out.add(v);
+    out.add(v.replace(/^a /,"").replace(/^an /,"").replace(/^the /,""));
+  }
+
+  add(s);
+
+  // Expand textbook notation such as "(by/at)", "(on)", "(to/about)".
+  const match = s.match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+  if(match){
+    const base = match[1].trim();
+    const options = match[2].split("/").map(x=>x.trim()).filter(Boolean);
+    add(base);
+    options.forEach(opt => add(base + " " + opt));
+  }
+
+  // New Zealand spelling note in "a fjord (NZ: fiord)"
+  if(/\(NZ:\s*fiord\)/i.test(s)){
+    add(s.replace(/\s*\(NZ:\s*fiord\)\s*/i,""));
+    add("a fiord");
+    add("fiord");
+  }
+
+  return [...out];
 }
 
 function makeQuestion(item, direction){
