@@ -151,6 +151,525 @@
   .mistake-row b{color:#8d2630}
   footer{text-align:center;color:#8a94a5;font-size:12px;margin-top:18px}
 
+
+
+
+
+  /* Multi-game selector */
+  .game-types{
+    display:none;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+  }
+  .game-types.show{display:grid}
+  .game-type{
+    position:relative;
+    display:block;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px;
+    background:#fbfdff;
+    cursor:pointer;
+    transition:.16s ease;
+  }
+  .game-type:hover{border-color:#9fc3f5;transform:translateY(-1px)}
+  .game-type input{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+  }
+  .game-type:has(input:checked){
+    border-color:var(--blue);
+    box-shadow:0 0 0 3px rgba(31,111,235,.10);
+    background:#f3f8ff;
+  }
+  body.dark .game-type{background:#151e2f;border-color:#334158}
+  body.dark .game-type:has(input:checked){
+    border-color:#5d96f7;
+    background:#172a45;
+  }
+  .game-type-icon{font-size:25px;line-height:1;margin-bottom:7px}
+  .game-type-name{font-size:13px;font-weight:900;margin-bottom:3px}
+  .game-type-desc{font-size:11px;color:var(--muted);line-height:1.35}
+
+  /* Shared 2D scene */
+  .game-scene{
+    display:none;
+    position:relative;
+    height:145px;
+    margin:0 0 22px;
+    border:1px solid var(--line);
+    border-radius:18px;
+    overflow:hidden;
+    background:#f5f8fc;
+    user-select:none;
+  }
+  .game-scene.show{display:block}
+  body.dark .game-scene{background:#0d1524;border-color:#2d3a50}
+
+  .scene-label{
+    position:absolute;
+    left:12px;
+    top:10px;
+    z-index:5;
+    border:1px solid rgba(255,255,255,.25);
+    border-radius:999px;
+    padding:5px 9px;
+    background:rgba(12,18,30,.68);
+    color:white;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    backdrop-filter:blur(5px);
+  }
+
+  /* Race */
+  .race-scene{
+    background:
+      linear-gradient(#bde6ff 0 48%, #82bd62 48% 63%, #343a46 63% 100%);
+  }
+  body.dark .race-scene{
+    background:
+      linear-gradient(#14243b 0 48%, #25432a 48% 63%, #252a34 63% 100%);
+  }
+  .race-road-line{
+    position:absolute;left:0;right:0;top:81%;height:3px;
+    background:repeating-linear-gradient(90deg,#fff 0 28px,transparent 28px 52px);
+    opacity:.8;
+  }
+  .race-finish{
+    position:absolute;right:8%;top:62%;bottom:4%;width:7px;
+    background:repeating-linear-gradient(0deg,#fff 0 7px,#111 7px 14px);
+  }
+  .race-car{
+    position:absolute;
+    left:4%;
+    font-size:34px;
+    transform:translateX(-50%);
+    transition:left .42s cubic-bezier(.2,.8,.2,1);
+    filter:drop-shadow(0 5px 4px rgba(0,0,0,.22));
+  }
+  #racePlayer{top:67%}
+  #raceCpu{top:43%;font-size:29px}
+  .race-name{
+    position:absolute;font-size:10px;font-weight:900;
+    color:white;background:rgba(0,0,0,.46);padding:3px 6px;border-radius:7px;
+    transform:translateX(-50%);transition:left .42s cubic-bezier(.2,.8,.2,1)
+  }
+  #racePlayerName{top:61%}
+  #raceCpuName{top:38%}
+
+  /* Meteor */
+  .meteor-scene{
+    background:
+      radial-gradient(circle at 20% 25%,rgba(255,255,255,.9) 0 1px,transparent 2px),
+      radial-gradient(circle at 70% 15%,rgba(255,255,255,.8) 0 1px,transparent 2px),
+      radial-gradient(circle at 87% 35%,rgba(255,255,255,.7) 0 1px,transparent 2px),
+      linear-gradient(#11182d,#26395a 72%,#172617 72%);
+  }
+  .meteor{
+    position:absolute;
+    left:50%;
+    top:19%;
+    transform:translate(-50%,-50%);
+    font-size:40px;
+    transition:top .11s linear,transform .18s ease;
+    filter:drop-shadow(0 5px 8px rgba(0,0,0,.35));
+  }
+  .meteor-city{
+    position:absolute;left:0;right:0;bottom:0;
+    height:34px;display:flex;align-items:end;justify-content:center;
+    font-size:29px;letter-spacing:5px;
+  }
+  .meteor-timer{
+    position:absolute;right:12px;top:10px;
+    color:white;font-weight:950;font-variant-numeric:tabular-nums;
+  }
+
+  /* Tower */
+  .tower-scene{
+    background:
+      linear-gradient(#cceaff 0 72%,#b9d991 72%);
+  }
+  body.dark .tower-scene{
+    background:linear-gradient(#16283f 0 72%,#213321 72%);
+  }
+  .tower{
+    position:absolute;left:50%;bottom:8px;width:62px;height:119px;
+    transform:translateX(-50%);
+    border:4px solid #7b6550;border-bottom-width:7px;border-radius:5px 5px 0 0;
+    background:repeating-linear-gradient(0deg,#d9bd91 0 17px,#b99a72 17px 20px);
+  }
+  .tower:before,.tower:after{
+    content:"";position:absolute;top:-17px;width:24px;height:18px;background:#9b815f;
+  }
+  .tower:before{left:-4px}.tower:after{right:-4px}
+  .climber{
+    position:absolute;
+    left:calc(50% + 43px);
+    bottom:5%;
+    font-size:31px;
+    transition:bottom .42s cubic-bezier(.2,.8,.2,1);
+    filter:drop-shadow(0 4px 3px rgba(0,0,0,.18));
+  }
+  .tower-flag{position:absolute;left:calc(50% + 3px);top:3px;font-size:26px}
+
+  /* Arcade scene */
+  .arcade-scene{
+    background:
+      radial-gradient(circle at 50% 50%,rgba(79,141,247,.18),transparent 45%),
+      linear-gradient(135deg,#18223a,#0f1628);
+    color:white;
+  }
+  .arcade-core{
+    position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
+    width:74px;height:74px;border-radius:50%;
+    display:grid;place-items:center;font-size:33px;
+    border:3px solid rgba(255,255,255,.75);
+    box-shadow:0 0 0 10px rgba(255,255,255,.05),0 0 35px rgba(86,150,255,.38);
+  }
+  .arcade-streak-text{
+    position:absolute;left:50%;bottom:9px;transform:translateX(-50%);
+    font-weight:900;font-size:12px;white-space:nowrap;
+  }
+
+  @media(max-width:850px){
+    .game-types{grid-template-columns:1fr}
+    .game-scene{height:125px}
+  }
+
+  /* Shared online leaderboard */
+  .leaderboard-btn{
+    border:1px solid var(--line);
+    background:#fff;
+    color:#334155;
+    min-height:44px;
+    padding:0 14px;
+    border-radius:13px;
+    font-weight:850;
+    white-space:nowrap;
+  }
+  .leaderboard-btn:hover{background:#f7faff}
+  body.dark .leaderboard-btn{background:#151e2f;color:#f3f6fb;border-color:#334158}
+  body.dark .leaderboard-btn:hover{background:#1a263b}
+
+  .leaderboard-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(6,10,18,.58);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:22px;
+    z-index:1000;
+    backdrop-filter:blur(5px);
+  }
+  .leaderboard-overlay.show{display:flex}
+  .leaderboard-modal{
+    width:min(760px,100%);
+    max-height:86vh;
+    overflow:auto;
+    background:var(--panel);
+    color:var(--text);
+    border:1px solid var(--line);
+    border-radius:22px;
+    box-shadow:0 30px 80px rgba(0,0,0,.28);
+    padding:22px;
+  }
+  .leaderboard-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:16px;
+  }
+  .leaderboard-title{font-size:22px;font-weight:950;letter-spacing:-.03em}
+  .leaderboard-close{
+    width:42px;height:42px;border-radius:12px;border:1px solid var(--line);
+    background:transparent;color:var(--text);font-size:20px;
+  }
+  .leaderboard-toolbar{
+    display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:14px;
+  }
+  .leaderboard-toolbar .field{min-width:150px;flex:1}
+  .leaderboard-status{
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:11px 12px;
+    color:var(--muted);
+    font-size:13px;
+    margin-bottom:12px;
+  }
+  .leaderboard-status.ok{color:var(--green)}
+  .leaderboard-status.error{color:var(--red)}
+  .leaderboard-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+  }
+  .leaderboard-table th,
+  .leaderboard-table td{
+    padding:11px 10px;
+    border-bottom:1px solid var(--line);
+    text-align:left;
+  }
+  .leaderboard-table th{
+    color:var(--muted);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+  }
+  .leaderboard-table td.score{font-weight:900}
+  .leaderboard-rank{
+    width:46px;
+    font-weight:950;
+  }
+  .leaderboard-name{
+    font-weight:800;
+    overflow-wrap:anywhere;
+  }
+  .leaderboard-empty{
+    text-align:center;
+    padding:28px 10px;
+    color:var(--muted);
+  }
+
+  .leaderboard-profile{
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:13px 14px;
+    background:#fbfdff;
+  }
+  body.dark .leaderboard-profile{background:#151e2f;border-color:#334158}
+  .leaderboard-profile input{
+    width:100%;
+    border:1px solid var(--line);
+    border-radius:11px;
+    padding:10px 11px;
+    background:#fff;
+    color:var(--text);
+    outline:none;
+    margin-top:7px;
+  }
+  body.dark .leaderboard-profile input{background:#101827;border-color:#334158}
+  .leaderboard-profile input:focus{
+    border-color:#72a8ed;
+    box-shadow:0 0 0 3px rgba(31,111,235,.10);
+  }
+
+  .online-score-card{
+    display:none;
+    text-align:left;
+    margin:22px auto 0;
+    max-width:620px;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:15px;
+    background:#fbfdff;
+  }
+  body.dark .online-score-card{background:#151e2f;border-color:#334158}
+  .online-score-card.show{display:block}
+  .online-score-title{font-weight:900;margin-bottom:5px}
+  .online-score-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:11px}
+  .online-score-status{font-size:13px;color:var(--muted)}
+  .online-score-status.ok{color:var(--green)}
+  .online-score-status.error{color:var(--red)}
+
+  @media(max-width:620px){
+    .leaderboard-overlay{padding:10px}
+    .leaderboard-modal{padding:16px}
+    .leaderboard-table th:nth-child(5),
+    .leaderboard-table td:nth-child(5){display:none}
+    .leaderboard-btn{padding:0 10px}
+  }
+
+  /* Game mode */
+  .game-option{
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:13px 14px;
+    background:#fbfdff;
+  }
+  body.dark .game-option{background:#151e2f;border-color:#334158}
+  .game-option-head{display:flex;align-items:center;gap:10px;font-weight:800}
+  .game-option-head input{accent-color:var(--blue);width:18px;height:18px}
+  .game-option-desc{margin:6px 0 0 28px;color:var(--muted);font-size:12px;line-height:1.45}
+
+  .game-hud{
+    display:none;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:9px;
+    margin-bottom:22px;
+  }
+  .game-hud.active{display:grid}
+  .game-chip{
+    border:1px solid var(--line);
+    border-radius:13px;
+    padding:10px 11px;
+    background:#f8fbff;
+    min-width:0;
+  }
+  body.dark .game-chip{background:#151e2f;border-color:#334158}
+  .game-chip-label{
+    display:block;
+    color:var(--muted);
+    font-size:10px;
+    font-weight:850;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin-bottom:3px;
+  }
+  .game-chip-value{
+    font-size:20px;
+    line-height:1;
+    font-weight:950;
+    white-space:nowrap;
+  }
+  .hearts{letter-spacing:1px;font-size:18px}
+  .game-float{
+    position:absolute;
+    right:36px;
+    top:32px;
+    font-weight:950;
+    font-size:18px;
+    opacity:0;
+    pointer-events:none;
+    transform:translateY(8px);
+  }
+  .game-float.pop{animation:scorePop .75s ease}
+  @keyframes scorePop{
+    0%{opacity:0;transform:translateY(8px) scale(.9)}
+    20%{opacity:1;transform:translateY(0) scale(1.08)}
+    70%{opacity:1}
+    100%{opacity:0;transform:translateY(-22px) scale(1)}
+  }
+  .quiz-main{position:relative}
+  .game-over{
+    display:none;
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:18px;
+    margin-top:18px;
+    background:#fff8ed;
+  }
+  body.dark .game-over{background:#2a2012;border-color:#574321}
+  .game-over.show{display:block}
+  .game-over-title{font-size:18px;font-weight:900;margin-bottom:5px}
+  .game-over-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+  .pulse-correct{animation:correctPulse .35s ease}
+  .shake-wrong{animation:wrongShake .32s ease}
+  @keyframes correctPulse{
+    0%{transform:scale(1)}
+    50%{transform:scale(1.015)}
+    100%{transform:scale(1)}
+  }
+  @keyframes wrongShake{
+    0%,100%{transform:translateX(0)}
+    25%{transform:translateX(-5px)}
+    75%{transform:translateX(5px)}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .game-float.pop,.pulse-correct,.shake-wrong{animation:none}
+  }
+
+  /* Dark mode */
+  body.dark{
+    --bg:#0b1020;
+    --panel:#111827;
+    --text:#f3f6fb;
+    --muted:#9ca9bd;
+    --line:#283449;
+    --blue:#4f8df7;
+    --blue2:#2f6fd9;
+    --green:#36c77b;
+    --red:#ff6b78;
+    --orange:#f59e0b;
+    --shadow:0 20px 55px rgba(0,0,0,.36);
+    background:
+      radial-gradient(circle at 10% 10%, rgba(79,141,247,.13), transparent 28rem),
+      radial-gradient(circle at 90% 90%, rgba(54,199,123,.08), transparent 30rem),
+      var(--bg);
+  }
+  body.dark .panel{
+    background:rgba(17,24,39,.97);
+    border-color:#283449;
+  }
+  body.dark .pill,
+  body.dark .cat,
+  body.dark select,
+  body.dark .ghost,
+  body.dark #answerInput{
+    background:#151e2f;
+    color:#f3f6fb;
+    border-color:#334158;
+  }
+  body.dark .cat:hover{border-color:#4f8df7}
+  body.dark .setup-side{border-color:#283449}
+  body.dark .field label,
+  body.dark .checkrow{color:#d6deea}
+  body.dark select:focus,
+  body.dark #answerInput:focus{
+    border-color:#5d96f7;
+    box-shadow:0 0 0 4px rgba(79,141,247,.14);
+  }
+  body.dark .sidebar{
+    background:linear-gradient(180deg,#101827,#111827);
+    border-color:#283449;
+  }
+  body.dark .progressbar{background:#243044}
+  body.dark .kbd{
+    background:#182236;
+    border-color:#3a4961;
+    color:#c7d1df;
+  }
+  body.dark .badge{
+    background:#172a45;
+    color:#83b5ff;
+    border-color:#27466f;
+  }
+  body.dark #answerInput.correct{
+    border-color:#36c77b;
+    background:#10251b;
+  }
+  body.dark #answerInput.wrong{
+    border-color:#ff6b78;
+    background:#2a1519;
+  }
+  body.dark .feedback.good{
+    background:#10251b;
+    border-color:#235d40;
+    color:#8ce2b0;
+  }
+  body.dark .feedback.bad{
+    background:#2a1519;
+    border-color:#66323a;
+    color:#ffabb2;
+  }
+  body.dark .danger-soft{
+    border-color:#66323a;
+    color:#ffabb2;
+    background:#251418;
+  }
+  body.dark .mistake-box{
+    background:#101827;
+    border-color:#283449;
+  }
+  body.dark .mistake-row{border-color:#283449}
+  body.dark .mistake-row b{color:#ff9099}
+  body.dark .score-ring:after{background:#111827}
+  body.dark footer{color:#768399}
+
+  .theme-toggle{
+    width:44px;height:44px;border-radius:13px;border:1px solid var(--line);
+    background:#fff;color:#334155;display:grid;place-items:center;
+    font-size:19px;transition:.16s ease;flex:0 0 auto;
+  }
+  .theme-toggle:hover{transform:translateY(-1px)}
+  body.dark .theme-toggle{
+    background:#151e2f;color:#f3f6fb;border-color:#334158;
+  }
+
   @media(max-width:850px){
     .app{padding:16px}
     .setup-grid{grid-template-columns:1fr}
@@ -172,7 +691,11 @@
         <div class="subtitle">Unit 1 — The Land of the Long White Cloud</div>
       </div>
     </div>
-    <div class="pill"><b id="totalWordsTop">0</b> woorden & uitdrukkingen</div>
+    <div class="row" style="flex-wrap:nowrap">
+      <div class="pill"><b id="totalWordsTop">0</b> woorden & uitdrukkingen</div>
+      <button id="leaderboardBtn" class="leaderboard-btn" type="button" title="Online leaderboard">🏆 Leaderboard</button>
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Dark mode aan/uit" title="Dark mode">🌙</button>
+    </div>
   </div>
 
   <section id="setupView" class="panel">
@@ -214,6 +737,51 @@
         </div>
         <label class="checkrow"><input id="shuffleCheck" type="checkbox" checked> Woorden door elkaar</label>
         <label class="checkrow"><input id="retryImmediatelyCheck" type="checkbox"> Fout woord meteen later nog eens laten terugkomen</label>
+
+        <div class="game-option">
+          <label class="game-option-head">
+            <input id="gameModeCheck" type="checkbox">
+            🎮 Game mode
+          </label>
+          <div class="game-option-desc">Leer dezelfde woorden, maar als spel. Je blijft je antwoorden zelf intypen.</div>
+        </div>
+
+        <div id="gameTypes" class="game-types" aria-label="Kies een spel">
+          <label class="game-type">
+            <input type="radio" name="gameType" value="arcade" checked>
+            <div class="game-type-icon">🕹️</div>
+            <div class="game-type-name">Arcade</div>
+            <div class="game-type-desc">5 levens, punten, streaks en combo's.</div>
+          </label>
+
+          <label class="game-type">
+            <input type="radio" name="gameType" value="race">
+            <div class="game-type-icon">🏎️</div>
+            <div class="game-type-name">Typing Race</div>
+            <div class="game-type-desc">Juiste antwoorden duwen je auto naar de finish.</div>
+          </label>
+
+          <label class="game-type">
+            <input type="radio" name="gameType" value="meteor">
+            <div class="game-type-icon">☄️</div>
+            <div class="game-type-name">Meteor Defense</div>
+            <div class="game-type-desc">Vertaal vóór de meteoriet de stad bereikt.</div>
+          </label>
+
+          <label class="game-type">
+            <input type="radio" name="gameType" value="tower">
+            <div class="game-type-icon">🧗</div>
+            <div class="game-type-name">Tower Climb</div>
+            <div class="game-type-desc">Elk juist antwoord brengt je dichter bij de top.</div>
+          </label>
+        </div>
+
+        <div id="leaderboardProfile" class="leaderboard-profile">
+          <div style="font-weight:850">🏆 Publieke leaderboard-naam</div>
+          <input id="playerNameInput" maxlength="18" autocomplete="nickname" placeholder="bv. Dragon09">
+          <div class="small" style="margin-top:6px">Gebruik liefst een nickname, geen volledige echte naam. Alleen Game Mode-scores kunnen online worden opgeslagen.</div>
+        </div>
+
         <button class="primary" id="startBtn">Start oefenen</button>
         <div class="small">Typ je antwoord en druk op <span class="kbd">Enter</span>. De website verbetert automatisch.</div>
       </div>
@@ -243,6 +811,53 @@
       </aside>
 
       <main class="quiz-main">
+        <div id="gameFloat" class="game-float">+100</div>
+
+        <div id="gameHud" class="game-hud" aria-live="polite">
+          <div class="game-chip">
+            <span class="game-chip-label">Levens</span>
+            <div id="gameHearts" class="game-chip-value hearts">❤️❤️❤️❤️❤️</div>
+          </div>
+          <div class="game-chip">
+            <span class="game-chip-label">Score</span>
+            <div id="gameScore" class="game-chip-value">0</div>
+          </div>
+          <div class="game-chip">
+            <span class="game-chip-label">Streak</span>
+            <div id="gameStreak" class="game-chip-value">🔥 0</div>
+          </div>
+        </div>
+
+        <div id="gameScene" class="game-scene" aria-hidden="true">
+          <div id="gameSceneLabel" class="scene-label">Arcade</div>
+
+          <div id="arcadeSceneContent">
+            <div class="arcade-core">⚡</div>
+            <div id="arcadeStreakText" class="arcade-streak-text">Bouw je streak op</div>
+          </div>
+
+          <div id="raceSceneContent" class="hidden">
+            <div class="race-road-line"></div>
+            <div class="race-finish"></div>
+            <div id="raceCpu" class="race-car">🚙</div>
+            <div id="racePlayer" class="race-car">🏎️</div>
+            <div id="raceCpuName" class="race-name">CPU</div>
+            <div id="racePlayerName" class="race-name">JIJ</div>
+          </div>
+
+          <div id="meteorSceneContent" class="hidden">
+            <div id="meteorTimer" class="meteor-timer">15.0s</div>
+            <div id="meteor" class="meteor">☄️</div>
+            <div class="meteor-city">🏠🏢🏠🏫🏠</div>
+          </div>
+
+          <div id="towerSceneContent" class="hidden">
+            <div class="tower"></div>
+            <div class="tower-flag">🚩</div>
+            <div id="climber" class="climber">🧗</div>
+          </div>
+        </div>
+
         <div id="questionBadge" class="badge"></div>
         <div id="directionText" class="direction"></div>
         <div id="promptText" class="prompt"></div>
@@ -261,6 +876,15 @@
           <button id="skipBtn" class="ghost danger-soft">Ik weet het niet</button>
           <div class="small">Hoofdletters, leestekens en accenten worden soepel gecontroleerd.</div>
         </div>
+
+        <div id="gameOverBox" class="game-over">
+          <div class="game-over-title">💥 Geen levens meer</div>
+          <div class="small">Je score blijft bewaard. Je kunt doorgaan met 3 nieuwe levens of opnieuw beginnen.</div>
+          <div class="game-over-actions">
+            <button id="continueGameBtn" class="primary" type="button">Doorgaan +3 ❤️</button>
+            <button id="restartGameBtn" class="ghost" type="button">Reeks opnieuw</button>
+          </div>
+        </div>
       </main>
     </div>
   </section>
@@ -276,6 +900,16 @@
       <h2 class="result-title" id="resultTitle">Reeks klaar</h2>
       <p class="result-sub" id="resultSub"></p>
 
+      <div id="onlineScoreCard" class="online-score-card">
+        <div class="online-score-title">🏆 Online leaderboard</div>
+        <div id="onlineScoreText" class="small">Je Game Mode-score kan online worden opgeslagen.</div>
+        <div class="online-score-actions">
+          <button id="saveOnlineScoreBtn" class="primary" type="button">Score opslaan</button>
+          <button id="openLeaderboardFromResultsBtn" class="ghost" type="button">Bekijk leaderboard</button>
+          <span id="onlineScoreStatus" class="online-score-status"></span>
+        </div>
+      </div>
+
       <div id="mistakeSection" class="hidden">
         <div class="section-title" style="text-align:left">Je fouten</div>
         <div id="mistakeBox" class="mistake-box"></div>
@@ -289,10 +923,271 @@
     </div>
   </section>
 
-  <footer>Werkt volledig offline — alles staat in dit HTML-bestand.</footer>
+  <footer>De woordtrainer werkt offline. Het gedeelde leaderboard gebruikt een online database.</footer>
+</div>
+
+<div id="leaderboardOverlay" class="leaderboard-overlay" role="dialog" aria-modal="true" aria-labelledby="leaderboardTitle">
+  <div class="leaderboard-modal">
+    <div class="leaderboard-head">
+      <div>
+        <div id="leaderboardTitle" class="leaderboard-title">🏆 Online leaderboard</div>
+        <div class="small">Top Game Mode-scores van iedereen die deze site gebruikt.</div>
+      </div>
+      <button id="leaderboardCloseBtn" class="leaderboard-close" type="button" aria-label="Sluiten">×</button>
+    </div>
+
+    <div class="leaderboard-toolbar">
+      <div class="field">
+        <label for="leaderboardGameFilter">Spel</label>
+        <select id="leaderboardGameFilter">
+          <option value="all">Alle games</option>
+          <option value="arcade">Arcade</option>
+          <option value="race">Typing Race</option>
+          <option value="meteor">Meteor Defense</option>
+          <option value="tower">Tower Climb</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="leaderboardSizeFilter">Reekslengte</label>
+        <select id="leaderboardSizeFilter">
+          <option value="all">Alle reeksen</option>
+          <option value="10">10 vragen</option>
+          <option value="20">20 vragen</option>
+          <option value="30">30 vragen</option>
+          <option value="50">50 vragen</option>
+          <option value="106">Volledige woordenlijst</option>
+        </select>
+      </div>
+      <button id="leaderboardRefreshBtn" class="ghost" type="button">↻ Vernieuwen</button>
+    </div>
+
+    <div id="leaderboardStatus" class="leaderboard-status">Leaderboard laden…</div>
+
+    <div style="overflow-x:auto">
+      <table class="leaderboard-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Speler</th>
+            <th>Game</th>
+            <th>Score</th>
+            <th>Streak</th>
+            <th>Juist / fout</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboardBody"></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
+
+/*
+  ONLINE LEADERBOARD CONFIG
+  -------------------------
+  1) Create a free Supabase project.
+  2) Run the supplied leaderboard_setup_supabase.sql in its SQL Editor.
+  3) Paste your Project URL and publishable/anon key below.
+  The public browser key is expected to be visible; the SQL file enables RLS
+  so visitors only get SELECT + INSERT access to leaderboard rows.
+*/
+const LEADERBOARD_CONFIG = {
+  supabaseUrl: "https://rsuoqcghhlyniryufkyj.supabase.co",
+  supabaseAnonKey: "sb_publishable_pNZ7Ado0PP8kCImEwd8Gnw_DcprpDd6"
+};
+
+function leaderboardConfigured(){
+  return /^https:\/\/.+\.supabase\.co$/i.test(LEADERBOARD_CONFIG.supabaseUrl)
+    && LEADERBOARD_CONFIG.supabaseAnonKey
+    && !LEADERBOARD_CONFIG.supabaseAnonKey.startsWith("PASTE_");
+}
+
+function leaderboardHeaders(extra={}){
+  return {
+    "apikey": LEADERBOARD_CONFIG.supabaseAnonKey,
+    "Authorization": "Bearer " + LEADERBOARD_CONFIG.supabaseAnonKey,
+    ...extra
+  };
+}
+
+function cleanPlayerName(value){
+  return String(value || "")
+    .replace(/[<>]/g,"")
+    .replace(/\s+/g," ")
+    .trim()
+    .slice(0,18);
+}
+
+function validPlayerName(value){
+  const v=cleanPlayerName(value);
+  return v.length>=2 && v.length<=18 && /^[\p{L}\p{N}_ .-]+$/u.test(v);
+}
+
+async function fetchLeaderboard(){
+  if(!leaderboardConfigured()){
+    throw new Error("Leaderboard-server is nog niet gekoppeld door de eigenaar van de site.");
+  }
+
+  const filter=$("leaderboardSizeFilter").value;
+  const gameFilter=$("leaderboardGameFilter").value;
+  let url=LEADERBOARD_CONFIG.supabaseUrl +
+    "/rest/v1/leaderboard_scores?select=player_name,game_type,score,correct_count,wrong_count,best_streak,questions_count,created_at" +
+    "&order=score.desc,best_streak.desc,created_at.asc&limit=50";
+
+  if(filter!=="all"){
+    url += "&questions_count=eq." + encodeURIComponent(filter);
+  }
+  if(gameFilter!=="all"){
+    url += "&game_type=eq." + encodeURIComponent(gameFilter);
+  }
+
+  const res=await fetch(url,{headers:leaderboardHeaders()});
+  if(!res.ok){
+    const msg=await res.text();
+    throw new Error("Leaderboard kon niet worden geladen. " + (msg || res.status));
+  }
+  return await res.json();
+}
+
+async function submitLeaderboardScore(){
+  if(!gameMode){
+    throw new Error("Alleen Game Mode-scores kunnen naar het leaderboard.");
+  }
+  if(!leaderboardConfigured()){
+    throw new Error("Leaderboard-server is nog niet gekoppeld door de eigenaar van de site.");
+  }
+
+  const name=cleanPlayerName($("playerNameInput").value);
+  if(!validPlayerName(name)){
+    throw new Error("Kies een nickname van 2–18 tekens.");
+  }
+
+  const questions=Math.max(1, lastFinishedScore.questionsCount || originalQueue.length || 1);
+  const score=Math.max(0, Math.floor(lastFinishedScore.score || 0));
+  const maxPossible=questions*300;
+  if(score>maxPossible){
+    throw new Error("Deze score kan niet worden verzonden.");
+  }
+
+  const payload={
+    player_name:name,
+    score,
+    correct_count:Math.max(0,Math.floor(lastFinishedScore.correct || 0)),
+    wrong_count:Math.max(0,Math.floor(lastFinishedScore.wrong || 0)),
+    best_streak:Math.max(0,Math.floor(lastFinishedScore.bestStreak || 0)),
+    questions_count:questions,
+    game_type:lastFinishedScore.gameType || gameType
+  };
+
+  const url=LEADERBOARD_CONFIG.supabaseUrl + "/rest/v1/leaderboard_scores";
+  const res=await fetch(url,{
+    method:"POST",
+    headers:leaderboardHeaders({
+      "Content-Type":"application/json",
+      "Prefer":"return=minimal"
+    }),
+    body:JSON.stringify(payload)
+  });
+
+  if(!res.ok){
+    const msg=await res.text();
+    throw new Error("Score kon niet worden opgeslagen. " + (msg || res.status));
+  }
+
+  localStorage.setItem("vocabLeaderboardName",name);
+  return payload;
+}
+
+function setLeaderboardStatus(message,type=""){
+  const el=$("leaderboardStatus");
+  el.textContent=message;
+  el.className="leaderboard-status"+(type ? " "+type : "");
+}
+
+function gameTypeLabel(type){
+  return ({
+    arcade:"Arcade",
+    race:"Typing Race",
+    meteor:"Meteor Defense",
+    tower:"Tower Climb"
+  })[type] || type || "Arcade";
+}
+
+function renderLeaderboard(rows){
+  const body=$("leaderboardBody");
+  body.innerHTML="";
+
+  if(!rows.length){
+    body.innerHTML='<tr><td colspan="6" class="leaderboard-empty">Nog geen scores voor deze reeks.</td></tr>';
+    return;
+  }
+
+  rows.forEach((row,i)=>{
+    const tr=document.createElement("tr");
+    const medal=i===0?"🥇":i===1?"🥈":i===2?"🥉":String(i+1);
+    tr.innerHTML=`
+      <td class="leaderboard-rank">${escapeHtml(medal)}</td>
+      <td class="leaderboard-name">${escapeHtml(row.player_name)}</td>
+      <td>${escapeHtml(gameTypeLabel(row.game_type))}</td>
+      <td class="score">${Number(row.score).toLocaleString("nl-BE")}</td>
+      <td>🔥 ${Number(row.best_streak)}</td>
+      <td>${Number(row.correct_count)} / ${Number(row.wrong_count)}</td>`;
+    body.appendChild(tr);
+  });
+}
+
+async function loadLeaderboard(){
+  setLeaderboardStatus("Leaderboard laden…");
+  $("leaderboardBody").innerHTML="";
+  try{
+    const rows=await fetchLeaderboard();
+    renderLeaderboard(rows);
+    setLeaderboardStatus(
+      rows.length ? `${rows.length} score${rows.length===1?"":"s"} geladen.` : "Nog geen scores voor deze reeks.",
+      "ok"
+    );
+  }catch(err){
+    renderLeaderboard([]);
+    setLeaderboardStatus(err.message,"error");
+  }
+}
+
+function openLeaderboard(){
+  $("leaderboardOverlay").classList.add("show");
+  loadLeaderboard();
+}
+function closeLeaderboard(){
+  $("leaderboardOverlay").classList.remove("show");
+}
+
+// Dark mode: remembers your choice. If you never chose, follows the laptop setting.
+const savedTheme = localStorage.getItem("vocabTheme");
+const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+if(savedTheme === "dark" || (!savedTheme && prefersDark)){
+  document.body.classList.add("dark");
+}
+
+function updateThemeButton(){
+  const btn=document.getElementById("themeToggle");
+  if(!btn) return;
+  const dark=document.body.classList.contains("dark");
+  btn.textContent=dark ? "☀️" : "🌙";
+  btn.title=dark ? "Light mode" : "Dark mode";
+  btn.setAttribute("aria-label", dark ? "Light mode inschakelen" : "Dark mode inschakelen");
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  updateThemeButton();
+  const savedName=localStorage.getItem("vocabLeaderboardName");
+  if(savedName) $("playerNameInput").value=savedName;
+  document.getElementById("themeToggle").addEventListener("click",()=>{
+    document.body.classList.toggle("dark");
+    localStorage.setItem("vocabTheme", document.body.classList.contains("dark") ? "dark" : "light");
+    updateThemeButton();
+  });
+});
+
 const vocabulary = [
   // Page 20 — only the bold vocabulary itself
   {c:"Landschap — enthousiasme", en:"awe-inspiring", nl:["ontzagwekkend"]},
@@ -491,6 +1386,31 @@ let answered = false;
 let mistakes = [];
 let current = null;
 let usedEnglishByDutchPrompt = {};
+let retryMistakesMode = false;
+
+let gameMode = false;
+let gameType = "arcade";
+let gameLives = 5;
+let gameScore = 0;
+let gameStreak = 0;
+let gamePaused = false;
+let gameBestStreak = 0;
+let lastFinishedScore = {
+  score:0,
+  correct:0,
+  wrong:0,
+  bestStreak:0,
+  questionsCount:0
+};
+let scoreSubmittedThisRound = false;
+
+let gameTimerId = null;
+let gameQuestionStartedAt = 0;
+let racePlayerProgress = 4;
+let raceCpuProgress = 4;
+let towerProgress = 5;
+let meteorDurationMs = 15000;
+let gameTimedOut = false;
 
 function normalize(s){
   return String(s)
@@ -534,7 +1454,7 @@ function variantsEnglish(s){
   return [...out];
 }
 
-function makeQuestion(item, direction){
+function makeQuestion(item, direction, activePool=vocabulary){
   const dir = direction==="mixed" ? (Math.random()<.5 ? "en-nl":"nl-en") : direction;
 
   if(dir==="en-nl"){
@@ -550,7 +1470,7 @@ function makeQuestion(item, direction){
 
   // All English vocabulary entries that use exactly this Dutch translation.
   // Example: "schitterend" may map to both "gorgeous" and "splendid".
-  const matchingEnglish = vocabulary
+  const matchingEnglish = activePool
     .filter(v => v.nl.some(n => normalize(n) === normalize(prompt)))
     .flatMap(v => variantsEnglish(v.en));
 
@@ -571,7 +1491,251 @@ function shuffle(arr){
   return arr;
 }
 
-function startQuiz(customQuestions=null){
+
+
+function selectedGameType(){
+  const selected=document.querySelector('input[name="gameType"]:checked');
+  return selected ? selected.value : "arcade";
+}
+
+function syncGameTypeVisibility(){
+  const enabled=$("gameModeCheck").checked;
+  $("gameTypes").classList.toggle("show",enabled);
+  $("leaderboardProfile").style.display=enabled ? "" : "none";
+}
+
+function clearGameTimer(){
+  if(gameTimerId!==null){
+    clearInterval(gameTimerId);
+    gameTimerId=null;
+  }
+}
+
+function setSceneContent(type){
+  ["arcade","race","meteor","tower"].forEach(name=>{
+    const el=$(name+"SceneContent");
+    if(el) el.classList.toggle("hidden",name!==type);
+  });
+  $("gameSceneLabel").textContent=gameTypeLabel(type);
+}
+
+function updateRaceVisual(){
+  const p=Math.max(4,Math.min(92,racePlayerProgress));
+  const c=Math.max(4,Math.min(92,raceCpuProgress));
+  $("racePlayer").style.left=p+"%";
+  $("racePlayerName").style.left=p+"%";
+  $("raceCpu").style.left=c+"%";
+  $("raceCpuName").style.left=c+"%";
+}
+
+function updateTowerVisual(){
+  const p=Math.max(5,Math.min(88,towerProgress));
+  $("climber").style.bottom=p+"%";
+}
+
+function startGameQuestionScene(){
+  clearGameTimer();
+  if(!gameMode){
+    $("gameScene").classList.remove("show");
+    return;
+  }
+
+  $("gameScene").classList.add("show");
+  setSceneContent(gameType);
+  gameQuestionStartedAt=Date.now();
+  gameTimedOut=false;
+
+  if(gameType==="arcade"){
+    $("arcadeStreakText").textContent =
+      gameStreak ? `🔥 ${gameStreak} op rij — combo actief` : "Bouw je streak op";
+  }
+
+  if(gameType==="race"){
+    updateRaceVisual();
+    // The CPU moves slowly while you are thinking. It never ends the quiz early.
+    gameTimerId=setInterval(()=>{
+      if(answered || gamePaused) return;
+      raceCpuProgress=Math.min(92,raceCpuProgress+0.32);
+      updateRaceVisual();
+    },250);
+  }
+
+  if(gameType==="meteor"){
+    const meteor=$("meteor");
+    meteor.textContent="☄️";
+    meteor.style.transform="translate(-50%,-50%)";
+    const started=Date.now();
+
+    const tick=()=>{
+      if(answered || gamePaused) return;
+      const elapsed=Date.now()-started;
+      const ratio=Math.max(0,Math.min(1,elapsed/meteorDurationMs));
+      meteor.style.top=(19 + ratio*54)+"%";
+      $("meteorTimer").textContent=Math.max(0,(meteorDurationMs-elapsed)/1000).toFixed(1)+"s";
+
+      if(ratio>=1){
+        clearGameTimer();
+        gameTimerId=null;
+        gameTimedOut=true;
+        meteor.textContent="💥";
+        checkAnswer(true);
+      }
+    };
+    tick();
+    gameTimerId=setInterval(tick,100);
+  }
+
+  if(gameType==="tower"){
+    updateTowerVisual();
+  }
+}
+
+function gameSceneCorrect(gained){
+  clearGameTimer();
+
+  if(gameType==="race" && !current._retry){
+    const step=88/Math.max(1,originalQueue.length);
+    const speedBonus=Math.max(0,Math.min(step*.45,(7000-(Date.now()-gameQuestionStartedAt))/7000*step*.45));
+    racePlayerProgress=Math.min(92,racePlayerProgress+step+speedBonus);
+    updateRaceVisual();
+  }
+
+  if(gameType==="meteor"){
+    const meteor=$("meteor");
+    meteor.textContent="✨";
+    meteor.style.transform="translate(-50%,-50%) scale(1.35)";
+    $("meteorTimer").textContent="GERED";
+  }
+
+  if(gameType==="tower" && !current._retry){
+    const step=83/Math.max(1,originalQueue.length);
+    towerProgress=Math.min(88,towerProgress+step);
+    updateTowerVisual();
+  }
+
+  if(gameType==="arcade"){
+    $("arcadeStreakText").textContent=`🔥 ${gameStreak} op rij · +${gained}`;
+  }
+}
+
+function gameSceneWrong(){
+  clearGameTimer();
+
+  if(gameType==="race"){
+    raceCpuProgress=Math.min(92,raceCpuProgress+Math.max(3,55/Math.max(1,originalQueue.length)));
+    updateRaceVisual();
+  }
+
+  if(gameType==="meteor"){
+    $("meteor").textContent="💥";
+    $("meteorTimer").textContent=gameTimedOut ? "TE LAAT" : "RAAK";
+  }
+
+  if(gameType==="tower"){
+    const slip=Math.max(3,35/Math.max(1,originalQueue.length));
+    towerProgress=Math.max(5,towerProgress-slip);
+    updateTowerVisual();
+  }
+
+  if(gameType==="arcade"){
+    $("arcadeStreakText").textContent="Combo kwijt — volgende lukt";
+  }
+}
+
+function gameEndSummary(){
+  if(!gameMode) return "";
+  if(gameType==="race"){
+    return racePlayerProgress>=raceCpuProgress
+      ? " · 🏁 jij eindigde vóór de CPU"
+      : " · 🏁 de CPU eindigde voor je";
+  }
+  if(gameType==="meteor"){
+    return gameLives>0 ? " · 🏙️ stad verdedigd" : " · 💥 verdediging doorbroken";
+  }
+  if(gameType==="tower"){
+    return towerProgress>=80 ? " · 🚩 top bereikt" : ` · 🧗 ${Math.round(towerProgress)}% geklommen`;
+  }
+  return "";
+}
+
+function updateGameHud(){
+  const hud=$("gameHud");
+  if(!hud) return;
+  hud.classList.toggle("active",gameMode);
+  $("gameHearts").textContent = gameLives > 0 ? "❤️".repeat(gameLives) : "💔";
+  $("gameScore").textContent = gameScore.toLocaleString("nl-BE");
+  $("gameStreak").textContent = "🔥 " + gameStreak;
+}
+
+function gameFloat(text){
+  if(!gameMode) return;
+  const el=$("gameFloat");
+  el.textContent=text;
+  el.classList.remove("pop");
+  void el.offsetWidth;
+  el.classList.add("pop");
+}
+
+function gameCorrect(){
+  if(!gameMode) return;
+  gameStreak++;
+  gameBestStreak=Math.max(gameBestStreak,gameStreak);
+
+  // Extra retry questions are for learning, not extra leaderboard points.
+  const retryQuestion=!!current._retry;
+  const bonus=Math.min(200,(gameStreak-1)*25);
+  const gained=retryQuestion ? 0 : 100+bonus;
+  gameScore+=gained;
+  gameFloat(gained ? "+"+gained : "Oefenvraag");
+  gameSceneCorrect(gained);
+  $("promptText").classList.remove("pulse-correct");
+  void $("promptText").offsetWidth;
+  $("promptText").classList.add("pulse-correct");
+  updateGameHud();
+}
+
+function gameWrong(){
+  if(!gameMode) return;
+  gameStreak=0;
+  gameLives=Math.max(0,gameLives-1);
+  gameFloat("-1 ❤️");
+  gameSceneWrong();
+  $("promptText").classList.remove("shake-wrong");
+  void $("promptText").offsetWidth;
+  $("promptText").classList.add("shake-wrong");
+  updateGameHud();
+
+  if(gameLives===0){
+    gamePaused=true;
+    $("gameOverBox").classList.add("show");
+    $("checkBtn").disabled=true;
+    $("skipBtn").disabled=true;
+  }
+}
+
+function resetGameState(){
+  gameMode=$("gameModeCheck").checked;
+  gameType=selectedGameType();
+  clearGameTimer();
+  gameLives=5;
+  gameScore=0;
+  gameStreak=0;
+  gameBestStreak=0;
+  gamePaused=false;
+  scoreSubmittedThisRound=false;
+  racePlayerProgress=4;
+  raceCpuProgress=4;
+  towerProgress=5;
+  gameTimedOut=false;
+  $("gameOverBox").classList.remove("show");
+  $("checkBtn").disabled=false;
+  $("skipBtn").disabled=false;
+  updateGameHud();
+}
+
+function startQuiz(customQuestions=null, options={}){
+  retryMistakesMode = !!options.retryMistakes;
+  resetGameState();
   if(customQuestions){
     queue = customQuestions.map(q=>({...q}));
   } else {
@@ -590,7 +1754,7 @@ function startQuiz(customQuestions=null){
     // Shuffle only inside the chosen block, so "11–20" stays the second block.
     if($("shuffleCheck").checked) pool=shuffle([...pool]);
 
-    queue=pool.map(item=>makeQuestion(item,$("directionSelect").value));
+    queue=pool.map(item=>makeQuestion(item,$("directionSelect").value,pool));
   }
   originalQueue=queue.map(q=>({...q}));
   index=0;correct=0;wrong=0;mistakes=[];answered=false;usedEnglishByDutchPrompt={};
@@ -619,6 +1783,12 @@ function showQuestion(){
   $("correctCount").textContent=correct;
   $("wrongCount").textContent=wrong;
   $("progressFill").style.width=((index/queue.length)*100)+"%";
+  $("gameOverBox").classList.remove("show");
+  gamePaused=false;
+  $("checkBtn").disabled=false;
+  $("skipBtn").disabled=false;
+  updateGameHud();
+  startGameQuestionScene();
   setTimeout(()=>$("answerInput").focus(),30);
 }
 
@@ -626,16 +1796,43 @@ function isCorrectAnswer(raw){
   const answer=normalize(raw);
   if(!answer) return false;
 
-  // Dutch -> English:
-  // First time a Dutch prompt appears, ANY matching English vocabulary word is accepted.
-  // Afterwards, an English answer that was already used for that same Dutch prompt is no longer accepted.
+  // Dutch -> English
   if(current.dir==="nl-en"){
     const key=normalize(current.prompt);
-    const used=new Set(usedEnglishByDutchPrompt[key] || []);
     const accepted=[...new Set(current.answers.map(normalize))];
+    const own=[...new Set((current.ownAnswers || variantsEnglish(current.item.en)).map(normalize))];
+
+    // Valid English answers for this Dutch prompt across the ENTIRE word list.
+    // This lets us recognize a synonym that is correct in the course,
+    // but is outside the currently selected 10/20/... word block.
+    const allVocabularyAnswers=[...new Set(
+      vocabulary
+        .filter(v => v.nl.some(n => normalize(n) === key))
+        .flatMap(v => variantsEnglish(v.en))
+        .map(normalize)
+    )];
+
+    if(allVocabularyAnswers.includes(answer) && !accepted.includes(answer)){
+      return "outsideSelection";
+    }
+
+    // When redoing mistakes, this question has one specific English target:
+    // the word that belonged to the item the learner actually got wrong.
+    // Another synonym is still a correct translation, but it should not complete
+    // this retry question.
+    if(retryMistakesMode){
+      if(own.includes(answer)) return true;
+      if(accepted.includes(answer)) return "rightButNotMistake";
+      return false;
+    }
+
+    // Normal round:
+    // first occurrence accepts any matching synonym; later occurrences require
+    // a synonym that has not already been used for the same Dutch prompt.
+    const used=new Set(usedEnglishByDutchPrompt[key] || []);
 
     if(!accepted.includes(answer)) return false;
-    if(used.has(answer)) return false;
+    if(used.has(answer)) return "used";
 
     if(!usedEnglishByDutchPrompt[key]) usedEnglishByDutchPrompt[key]=[];
     usedEnglishByDutchPrompt[key].push(answer);
@@ -661,22 +1858,67 @@ function checkAnswer(forceWrong=false){
   if(answered){ nextQuestion(); return; }
 
   const raw=$("answerInput").value;
-  const ok=!forceWrong && isCorrectAnswer(raw);
+  const result=forceWrong ? false : isCorrectAnswer(raw);
+
+  // Correct somewhere in the complete vocabulary list, but not in
+  // the currently selected part. Don't count it as wrong; keep the same question.
+  if(result==="outsideSelection"){
+    $("answerInput").classList.remove("correct","wrong");
+    $("feedback").className="feedback show good";
+    $("feedbackTitle").textContent="Dit woord staat wel in de woordenlijst, maar niet in het huidige geselecteerde deel.";
+    $("feedbackText").textContent="Geef een antwoord dat in deze geselecteerde reeks voorkomt.";
+    $("answerInput").value="";
+    $("answerInput").focus();
+    return;
+  }
+
+  // During "maak mijn fouten opnieuw": this is a valid synonym,
+  // but not the specific vocabulary item that was wrong.
+  if(result==="rightButNotMistake"){
+    $("answerInput").classList.remove("correct","wrong");
+    $("feedback").className="feedback show good";
+    $("feedbackTitle").textContent="Dit was niet het woord dat je fout was, maar het is wel juist.";
+    $("feedbackText").textContent="Probeer nu het Engelse woord dat bij deze fout hoorde.";
+    $("answerInput").value="";
+    $("answerInput").focus();
+    return;
+  }
+
+  // The answer is a valid translation, but the learner already used it earlier.
+  // Don't count it as wrong and don't advance: ask for another translation.
+  if(result==="used"){
+    $("answerInput").classList.remove("correct","wrong");
+    $("feedback").className="feedback show bad";
+    $("feedbackTitle").textContent="Dit woord heb je al eens ingevuld.";
+    $("feedbackText").textContent="Geef een andere Engelse vertaling voor dit Nederlandse woord.";
+    $("answerInput").value="";
+    $("answerInput").focus();
+    return;
+  }
+
+  const ok=result===true;
   answered=true;
   $("answerInput").readOnly=true;
 
   if(ok){
     correct++;
+    gameCorrect();
     $("answerInput").classList.add("correct");
     $("feedback").className="feedback show good";
     $("feedbackTitle").textContent="Juist!";
     $("feedbackText").textContent="Goed gedaan.";
   }else{
     wrong++;
+    gameWrong();
     $("answerInput").classList.add("wrong");
     addMistake(current,raw);
     $("feedback").className="feedback show bad";
-    $("feedbackTitle").textContent=forceWrong ? "Geen probleem — dit was het antwoord:" : "Niet juist. Dit is het correcte antwoord:";
+    $("feedbackTitle").textContent = gameTimedOut
+      ? "Te laat — dit was het antwoord:"
+      : forceWrong
+        ? "Geen probleem — dit was het antwoord:"
+        : "Niet juist. Dit is het correcte antwoord:";
+
     if(current.dir==="nl-en"){
       const key=normalize(current.prompt);
       const used=new Set(usedEnglishByDutchPrompt[key] || []);
@@ -698,15 +1940,19 @@ function checkAnswer(forceWrong=false){
 
   $("correctCount").textContent=correct;
   $("wrongCount").textContent=wrong;
-  $("checkBtn").textContent="Volgende";
+  if(!(gameMode && gameLives===0)){
+    $("checkBtn").textContent="Volgende";
+  }
 }
 
 function nextQuestion(){
+  clearGameTimer();
   index++;
   showQuestion();
 }
 
 function finishQuiz(){
+  clearGameTimer();
   $("quizView").style.display="none";
   $("resultsView").style.display="block";
   const total=correct+wrong;
@@ -714,7 +1960,36 @@ function finishQuiz(){
   $("scorePercent").textContent=pct+"%";
   $("scoreRing").style.background=`conic-gradient(var(--green) ${pct*3.6}deg, #e8eef5 0deg)`;
   $("resultTitle").textContent = pct===100 ? "Perfecte reeks!" : pct>=80 ? "Sterke ronde!" : "Reeks klaar";
-  $("resultSub").textContent=`${correct} juist · ${wrong} fout · ${total} beantwoord`;
+  $("resultSub").textContent = gameMode
+    ? `${gameTypeLabel(gameType)} · ${correct} juist · ${wrong} fout · ${gameScore.toLocaleString("nl-BE")} punten · beste streak ${gameBestStreak}${gameEndSummary()}`
+    : `${correct} juist · ${wrong} fout · ${total} beantwoord`;
+
+  lastFinishedScore={
+    score:gameScore,
+    correct,
+    wrong,
+    bestStreak:gameBestStreak,
+    questionsCount:originalQueue.length,
+    gameType
+  };
+
+  const onlineCard=$("onlineScoreCard");
+  const onlineStatus=$("onlineScoreStatus");
+  onlineStatus.textContent="";
+  onlineStatus.className="online-score-status";
+
+  if(gameMode){
+    onlineCard.classList.add("show");
+    $("onlineScoreText").textContent =
+      `${gameTypeLabel(gameType)} · score: ${gameScore.toLocaleString("nl-BE")} · ${originalQueue.length} vragen. ` +
+      (leaderboardConfigured()
+        ? "Je kunt deze ronde publiceren."
+        : "Online opslag is nog niet gekoppeld door de eigenaar van de site.");
+    $("saveOnlineScoreBtn").disabled=!leaderboardConfigured();
+    $("saveOnlineScoreBtn").style.opacity=leaderboardConfigured() ? "1" : ".5";
+  }else{
+    onlineCard.classList.remove("show");
+  }
 
   const section=$("mistakeSection"), box=$("mistakeBox");
   box.innerHTML="";
@@ -742,6 +2017,7 @@ $("skipBtn").onclick=()=>{ if(!answered) checkAnswer(true); else nextQuestion();
 $("answerInput").addEventListener("keydown",e=>{
   if(e.key==="Enter"){
     e.preventDefault();
+    if(gamePaused) return;
     if(answered) nextQuestion(); else checkAnswer();
   }
 });
@@ -749,6 +2025,7 @@ $("answerInput").addEventListener("keydown",e=>{
 document.addEventListener("keydown",e=>{
   if(e.key==="Escape" && $("quizView").style.display==="block"){
     if(confirm("Stoppen met deze reeks en terug naar de instellingen?")){
+      clearGameTimer();
       $("quizView").style.display="none";
       $("setupView").style.display="block";
     }
@@ -759,16 +2036,93 @@ $("retryMistakesBtn").onclick=()=>{
   if(!mistakes.length) return;
   const qs=mistakes.map(m=>({...m.q,_retry:false}));
   if($("shuffleCheck").checked) shuffle(qs);
-  startQuiz(qs);
+  startQuiz(qs,{retryMistakes:true});
 };
 $("retryAllBtn").onclick=()=>{
   const qs=originalQueue.map(q=>({...q,_retry:false}));
   if($("shuffleCheck").checked) shuffle(qs);
-  startQuiz(qs);
+  startQuiz(qs,{retryMistakes:false});
 };
 $("backSetupBtn").onclick=()=>{
   $("resultsView").style.display="none";
   $("setupView").style.display="block";
+};
+
+$("continueGameBtn").onclick=()=>{
+  gameLives=3;
+  gameStreak=0;
+  gamePaused=false;
+  $("gameOverBox").classList.remove("show");
+  $("checkBtn").disabled=false;
+  $("skipBtn").disabled=false;
+  $("checkBtn").textContent="Volgende";
+  updateGameHud();
+};
+
+$("restartGameBtn").onclick=()=>{
+  const qs=originalQueue.map(q=>({...q,_retry:false}));
+  if($("shuffleCheck").checked) shuffle(qs);
+  startQuiz(qs,{retryMistakes:false});
+};
+
+$("gameModeCheck").addEventListener("change",syncGameTypeVisibility);
+document.querySelectorAll('input[name="gameType"]').forEach(radio=>{
+  radio.addEventListener("change",()=>{
+    localStorage.setItem("vocabGameType",selectedGameType());
+  });
+});
+const savedGameType=localStorage.getItem("vocabGameType");
+if(savedGameType){
+  const radio=document.querySelector(`input[name="gameType"][value="${savedGameType}"]`);
+  if(radio) radio.checked=true;
+}
+syncGameTypeVisibility();
+
+$("leaderboardBtn").onclick=openLeaderboard;
+$("openLeaderboardFromResultsBtn").onclick=openLeaderboard;
+$("leaderboardCloseBtn").onclick=closeLeaderboard;
+$("leaderboardRefreshBtn").onclick=loadLeaderboard;
+$("leaderboardSizeFilter").addEventListener("change",loadLeaderboard);
+$("leaderboardGameFilter").addEventListener("change",loadLeaderboard);
+$("leaderboardOverlay").addEventListener("click",e=>{
+  if(e.target===$("leaderboardOverlay")) closeLeaderboard();
+});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape" && $("leaderboardOverlay").classList.contains("show")){
+    closeLeaderboard();
+  }
+});
+
+$("playerNameInput").addEventListener("change",()=>{
+  const name=cleanPlayerName($("playerNameInput").value);
+  $("playerNameInput").value=name;
+  if(validPlayerName(name)) localStorage.setItem("vocabLeaderboardName",name);
+});
+
+$("saveOnlineScoreBtn").onclick=async()=>{
+  const btn=$("saveOnlineScoreBtn");
+  const status=$("onlineScoreStatus");
+
+  if(scoreSubmittedThisRound){
+    status.textContent="Deze ronde staat al op het leaderboard.";
+    status.className="online-score-status ok";
+    return;
+  }
+
+  btn.disabled=true;
+  status.textContent="Opslaan…";
+  status.className="online-score-status";
+
+  try{
+    await submitLeaderboardScore();
+    scoreSubmittedThisRound=true;
+    status.textContent="✓ Score online opgeslagen";
+    status.className="online-score-status ok";
+  }catch(err){
+    status.textContent=err.message;
+    status.className="online-score-status error";
+    btn.disabled=false;
+  }
 };
 
 </script>
