@@ -205,6 +205,13 @@
             <option value="all" selected>Volledige reeks</option>
           </select>
         </div>
+        <div class="field" id="chunkField">
+          <label for="chunkSelect">Welk deel?</label>
+          <select id="chunkSelect">
+            <option value="0">Eerste reeks</option>
+          </select>
+          <div class="small" style="margin-top:6px">Bij 10 vragen kun je zo 1–10, 11–20, 21–30, ... kiezen.</div>
+        </div>
         <label class="checkrow"><input id="shuffleCheck" type="checkbox" checked> Woorden door elkaar</label>
         <label class="checkrow"><input id="retryImmediatelyCheck" type="checkbox"> Fout woord meteen later nog eens laten terugkomen</label>
         <button class="primary" id="startBtn">Start oefenen</button>
@@ -426,10 +433,54 @@ function renderCategories(){
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 }
+
 renderCategories();
 
-$("selectAllBtn").onclick=()=>document.querySelectorAll(".cat-check").forEach(x=>x.checked=true);
-$("selectNoneBtn").onclick=()=>document.querySelectorAll(".cat-check").forEach(x=>x.checked=false);
+function getSelectedPool(){
+  const selected=[...document.querySelectorAll(".cat-check:checked")].map(x=>x.value);
+  return vocabulary.filter(v=>selected.includes(v.c));
+}
+
+function updateChunkOptions(){
+  const field=$("chunkField");
+  const sel=$("chunkSelect");
+  const amountValue=$("amountSelect").value;
+
+  if(amountValue==="all"){
+    field.classList.add("hidden");
+    sel.innerHTML='<option value="0">Volledige reeks</option>';
+    return;
+  }
+
+  field.classList.remove("hidden");
+  const size=parseInt(amountValue,10);
+  const total=getSelectedPool().length;
+  const chunks=Math.max(1,Math.ceil(total/size));
+  const previous=parseInt(sel.value||"0",10);
+
+  sel.innerHTML="";
+  for(let i=0;i<chunks;i++){
+    const start=i*size+1;
+    const end=Math.min((i+1)*size,total);
+    const opt=document.createElement("option");
+    opt.value=String(i);
+    opt.textContent = `${start}–${end}`;
+    sel.appendChild(opt);
+  }
+
+  sel.value=String(Math.min(previous,chunks-1));
+}
+
+$("amountSelect").addEventListener("change",updateChunkOptions);
+document.addEventListener("change",e=>{
+  if(e.target.classList && e.target.classList.contains("cat-check")) updateChunkOptions();
+});
+
+
+$("selectAllBtn").onclick=()=>{document.querySelectorAll(".cat-check").forEach(x=>x.checked=true);updateChunkOptions();};
+$("selectNoneBtn").onclick=()=>{document.querySelectorAll(".cat-check").forEach(x=>x.checked=false);updateChunkOptions();};
+
+updateChunkOptions();
 
 let queue = [];
 let originalQueue = [];
@@ -439,6 +490,7 @@ let wrong = 0;
 let answered = false;
 let mistakes = [];
 let current = null;
+let usedEnglishByDutchPrompt = {};
 
 function normalize(s){
   return String(s)
@@ -484,6 +536,7 @@ function variantsEnglish(s){
 
 function makeQuestion(item, direction){
   const dir = direction==="mixed" ? (Math.random()<.5 ? "en-nl":"nl-en") : direction;
+
   if(dir==="en-nl"){
     return {
       item, dir,
@@ -491,14 +544,23 @@ function makeQuestion(item, direction){
       answers:item.nl,
       display:item.nl.join(" / ")
     };
-  } else {
-    return {
-      item, dir,
-      prompt:item.nl[0],
-      answers:variantsEnglish(item.en),
-      display:item.en
-    };
   }
+
+  const prompt = item.nl[0];
+
+  // All English vocabulary entries that use exactly this Dutch translation.
+  // Example: "schitterend" may map to both "gorgeous" and "splendid".
+  const matchingEnglish = vocabulary
+    .filter(v => v.nl.some(n => normalize(n) === normalize(prompt)))
+    .flatMap(v => variantsEnglish(v.en));
+
+  return {
+    item, dir,
+    prompt,
+    answers:[...new Set(matchingEnglish)],
+    ownAnswers:variantsEnglish(item.en),
+    display:item.en
+  };
 }
 
 function shuffle(arr){
@@ -516,14 +578,22 @@ function startQuiz(customQuestions=null){
     const selected=[...document.querySelectorAll(".cat-check:checked")].map(x=>x.value);
     if(!selected.length){ alert("Selecteer minstens één onderdeel."); return; }
     let pool=vocabulary.filter(v=>selected.includes(v.c));
+
+    const amountValue=$("amountSelect").value;
+    if(amountValue!=="all"){
+      const n=parseInt(amountValue,10);
+      const chunkIndex=parseInt($("chunkSelect").value||"0",10);
+      const start=chunkIndex*n;
+      pool=pool.slice(start,start+n);
+    }
+
+    // Shuffle only inside the chosen block, so "11–20" stays the second block.
     if($("shuffleCheck").checked) pool=shuffle([...pool]);
 
-    const n = $("amountSelect").value==="all" ? pool.length : Math.min(parseInt($("amountSelect").value),pool.length);
-    pool=pool.slice(0,n);
     queue=pool.map(item=>makeQuestion(item,$("directionSelect").value));
   }
   originalQueue=queue.map(q=>({...q}));
-  index=0;correct=0;wrong=0;mistakes=[];answered=false;
+  index=0;correct=0;wrong=0;mistakes=[];answered=false;usedEnglishByDutchPrompt={};
   $("setupView").style.display="none";
   $("resultsView").style.display="none";
   $("quizView").style.display="block";
@@ -555,10 +625,27 @@ function showQuestion(){
 function isCorrectAnswer(raw){
   const answer=normalize(raw);
   if(!answer) return false;
+
+  // Dutch -> English:
+  // First time a Dutch prompt appears, ANY matching English vocabulary word is accepted.
+  // Afterwards, an English answer that was already used for that same Dutch prompt is no longer accepted.
+  if(current.dir==="nl-en"){
+    const key=normalize(current.prompt);
+    const used=new Set(usedEnglishByDutchPrompt[key] || []);
+    const accepted=[...new Set(current.answers.map(normalize))];
+
+    if(!accepted.includes(answer)) return false;
+    if(used.has(answer)) return false;
+
+    if(!usedEnglishByDutchPrompt[key]) usedEnglishByDutchPrompt[key]=[];
+    usedEnglishByDutchPrompt[key].push(answer);
+    return true;
+  }
+
+  // English -> Dutch stays as before.
   const accepted=current.answers.map(normalize);
   if(accepted.includes(answer)) return true;
 
-  // For Dutch answers, allow articles in front of noun translations.
   const stripped=answer.replace(/^(een|de|het) /,"");
   if(accepted.some(a=>a.replace(/^(een|de|het) /,"")===stripped)) return true;
   return false;
@@ -590,7 +677,16 @@ function checkAnswer(forceWrong=false){
     addMistake(current,raw);
     $("feedback").className="feedback show bad";
     $("feedbackTitle").textContent=forceWrong ? "Geen probleem — dit was het antwoord:" : "Niet juist. Dit is het correcte antwoord:";
-    $("feedbackText").innerHTML=`<span class="answer-display">${escapeHtml(current.display)}</span>`;
+    if(current.dir==="nl-en"){
+      const key=normalize(current.prompt);
+      const used=new Set(usedEnglishByDutchPrompt[key] || []);
+      const all=[...new Set(current.answers.map(normalize))];
+      const remaining=all.filter(a=>!used.has(a));
+      const show = remaining.length ? remaining.join(" / ") : current.display;
+      $("feedbackText").innerHTML=`<span class="answer-display">${escapeHtml(show)}</span>`;
+    }else{
+      $("feedbackText").innerHTML=`<span class="answer-display">${escapeHtml(current.display)}</span>`;
+    }
 
     if($("retryImmediatelyCheck").checked && !queue[index]._retry){
       const retry={...current,_retry:true};
